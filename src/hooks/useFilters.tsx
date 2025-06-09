@@ -1,5 +1,11 @@
 
-import { useState, useEffect } from 'react';
+import {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  ReactNode,
+} from 'react';
 
 export interface DateRange {
   from: Date | undefined;
@@ -12,7 +18,23 @@ export interface DashboardFilters {
   dateRange: DateRange;
 }
 
+type FiltersContextType = {
+  filters: DashboardFilters;
+  updateFilters: (updates: Partial<DashboardFilters>) => void;
+  resetFilters: () => void;
+};
+
+const FiltersContext = createContext<FiltersContextType | undefined>(undefined);
+
 export const useFilters = () => {
+  const context = useContext(FiltersContext);
+  if (!context) {
+    throw new Error('useFilters must be used within a FiltersProvider');
+  }
+  return context;
+};
+
+export const FiltersProvider = ({ children }: { children: ReactNode }) => {
   const [filters, setFilters] = useState<DashboardFilters>(() => {
     // Try to load from localStorage
     const saved = localStorage.getItem('dashboard-filters');
@@ -60,9 +82,9 @@ export const useFilters = () => {
     });
   };
 
-  return {
-    filters,
-    updateFilters,
-    resetFilters,
-  };
+  return (
+    <FiltersContext.Provider value={{ filters, updateFilters, resetFilters }}>
+      {children}
+    </FiltersContext.Provider>
+  );
 };

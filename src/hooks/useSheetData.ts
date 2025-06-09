@@ -9,12 +9,16 @@ export interface SheetRow {
   impressions: number;
   clicks: number;
   amountSpent: number;
+  cpm: number;
+  cpc: number;
+  ctr: number;
   actionMessagingConversationsStarted: number;
   costPerActionMessagingConversations: number;
   actionLinkClicks: number;
   reach: number;
   frequency: number;
-  cpm: number;
+  adcreativeName: string;
+  thumbnailUrl: string;
   day: string;
   [key: string]: unknown; // Para outras colunas que possam existir
 }
@@ -66,6 +70,7 @@ export const useSheetData = (sheetId: string, range: string = 'Meta!A1:Z') => {
               mappedRow.clicks = parseFloat(value) || 0;
               break;
             case 'amount spent':
+            case 'spend (cost, amount spent)':
               mappedRow.amountSpent = parseFloat(value) || 0;
               break;
             case 'action messaging conversations started (onsite conversion)':
@@ -84,7 +89,20 @@ export const useSheetData = (sheetId: string, range: string = 'Meta!A1:Z') => {
               mappedRow.frequency = parseFloat(value) || 0;
               break;
             case 'cpm':
+            case 'cpm (cost per 1000 impressions)':
               mappedRow.cpm = parseFloat(value) || 0;
+              break;
+            case 'cpc (cost per click)':
+              mappedRow.cpc = parseFloat(value) || 0;
+              break;
+            case 'ctr (clickthrough rate)':
+              mappedRow.ctr = parseFloat(value) || 0;
+              break;
+            case 'adcreative name':
+              mappedRow.adcreativeName = value;
+              break;
+            case 'thumbnail url':
+              mappedRow.thumbnailUrl = value;
               break;
             case 'day':
             case 'date':

@@ -6,23 +6,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { MoreHorizontal, TrendingUp, TrendingDown } from 'lucide-react';
 import { SheetRow } from '@/hooks/useSheetData';
 
+import { TabSection } from '@/hooks/usePlatformNavigation';
+
 interface CampaignTableProps {
   data: SheetRow[];
+  section?: TabSection;
 }
 
-const CampaignTable = ({ data }: CampaignTableProps) => {
-  const getDevicePlatformBadge = (platform: string) => {
-    const colors: { [key: string]: string } = {
-      'mobile_app': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
-      'mobile_web': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-      'desktop': 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400',
-      'instagram': 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400',
-      'facebook': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400',
-    };
-
-    const colorClass = colors[platform] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
-    return <Badge className={`${colorClass} text-xs px-2 py-0.5 transition-all duration-200 hover:scale-105`}>{platform || 'N/A'}</Badge>;
-  };
+const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
 
   const calculateCTR = (clicks: number, impressions: number) => {
     return impressions > 0 ? ((clicks / impressions) * 100).toFixed(2) : '0.00';
@@ -46,13 +37,23 @@ const CampaignTable = ({ data }: CampaignTableProps) => {
         }).format(num)
       : 'R$ 0,00';
 
+  const headerTitle =
+    section === 'grupos'
+      ? 'Dados Detalhados dos Grupos de Anúncio'
+      : section === 'anuncios'
+        ? 'Dados Detalhados dos Anúncios'
+        : 'Dados Detalhados das Campanhas';
+
+  const firstColHeader =
+    section === 'grupos' ? 'Grupo de Anúncio' : section === 'anuncios' ? 'Anúncio' : 'Campanha';
+
   return (
     <TooltipProvider>
       <Card className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Dados Detalhados das Campanhas
+              {headerTitle}
             </CardTitle>
             <Badge variant="outline" className="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-700 transition-all duration-200 hover:scale-105">
               {data.length} registros
@@ -64,7 +65,7 @@ const CampaignTable = ({ data }: CampaignTableProps) => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[200px]">Campanha</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[200px]">{firstColHeader}</th>
                   <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Data</th>
                   <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[120px]">Plataforma</th>
                   <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
@@ -85,23 +86,59 @@ const CampaignTable = ({ data }: CampaignTableProps) => {
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <div className="font-medium text-gray-900 dark:text-gray-100 text-xs cursor-help truncate">
-                                {truncateText(row.campaignName || 'N/A', 25)}
+                                {truncateText(
+                                  (section === 'grupos'
+                                    ? row.adSetName
+                                    : section === 'anuncios'
+                                      ? row.adName
+                                      : row.campaignName) || 'N/A',
+                                  25
+                                )}
                               </div>
                             </TooltipTrigger>
                             <TooltipContent className="bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 p-2 rounded-lg shadow-lg">
-                              <p className="font-medium">{row.campaignName || 'N/A'}</p>
+                              <p className="font-medium">
+                                {section === 'grupos'
+                                  ? row.adSetName || 'N/A'
+                                  : section === 'anuncios'
+                                    ? row.adName || 'N/A'
+                                    : row.campaignName || 'N/A'}
+                              </p>
                             </TooltipContent>
                           </Tooltip>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div className="text-xs text-gray-500 dark:text-gray-400 cursor-help truncate">
-                                {truncateText(row.adSetName || 'N/A', 25)}
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent className="bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 p-2 rounded-lg shadow-lg">
-                              <p>{row.adSetName || 'N/A'}</p>
-                            </TooltipContent>
-                          </Tooltip>
+                          {(section !== 'campanhas') && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="text-xs text-gray-500 dark:text-gray-400 cursor-help truncate">
+                                  {truncateText(
+                                    (section === 'anuncios'
+                                      ? row.adSetName
+                                      : row.campaignName) || 'N/A',
+                                    25
+                                  )}
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent className="bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 p-2 rounded-lg shadow-lg">
+                                <p>
+                                  {section === 'anuncios'
+                                    ? row.adSetName || 'N/A'
+                                    : row.campaignName || 'N/A'}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                          {section === 'anuncios' && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="text-xs text-gray-500 dark:text-gray-400 cursor-help truncate">
+                                  {truncateText(row.campaignName || 'N/A', 25)}
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent className="bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 p-2 rounded-lg shadow-lg">
+                                <p>{row.campaignName || 'N/A'}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
                         </div>
                         {row.clicks > 100 ? (
                           <TrendingUp className="w-3 h-3 text-green-500 transition-transform duration-200 group-hover/row:scale-110" />
@@ -116,7 +153,9 @@ const CampaignTable = ({ data }: CampaignTableProps) => {
                       </div>
                     </td>
                     <td className="py-3 px-2">
-                      {getDevicePlatformBadge(row.devicePlatform)}
+                      <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
+                        {row.accountName || 'N/A'}
+                      </div>
                     </td>
                     <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
                       {formatNumber(row.impressions)}
@@ -136,17 +175,9 @@ const CampaignTable = ({ data }: CampaignTableProps) => {
                       {typeof row.cpm === 'number' && !isNaN(row.cpm) ? `R$ ${row.cpm.toFixed(2)}` : 'R$ 0,00'}
                     </td>
                     <td className="py-3 px-2 text-right">
-                      <div className="font-medium text-gray-900 dark:text-gray-100 text-xs">{formatNumber(row.messagingConversations)}</div>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 cursor-help truncate">
-                            {truncateText(row.conversionDevice || 'N/A', 12)}
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent className="bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 p-2 rounded-lg shadow-lg">
-                          <p>{row.conversionDevice || 'N/A'}</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      <div className="font-medium text-gray-900 dark:text-gray-100 text-xs">
+                        {formatNumber(row.actionMessagingConversationsStarted)}
+                      </div>
                     </td>
                     <td className="py-3 px-2 text-center">
                       <Button 
