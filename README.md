@@ -247,3 +247,13 @@ To connect a domain, navigate to Project > Settings > Domains and click Connect 
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
 >>>>>>> 9f075bd (Commit inicial)
+
+## Installing dependencies before lint or build
+
+Run the following commands:
+
+```sh
+npm install
+npm run lint
+npm run build
+```
