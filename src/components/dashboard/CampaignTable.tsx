@@ -66,21 +66,48 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[200px]">{firstColHeader}</th>
-                  <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Data</th>
-                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
-                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
-                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
-                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Gasto</th>
-                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">CPM</th>
-                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Conversas</th>
-                  <th className="text-center py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">Ações</th>
-                </tr>
+                {section === 'grupos' ? (
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                    <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[200px]">Grupo de Anúncio</th>
+                    <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Data</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Conversões</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Custo/Conversão</th>
+                  </tr>
+                ) : section === 'anuncios' ? (
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                    <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[180px]">Anúncio</th>
+                    <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">Criativo</th>
+                    <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Data</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Frequência</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Conversões</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Custo/Conversão</th>
+                  </tr>
+                ) : (
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                    <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[200px]">{firstColHeader}</th>
+                    <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Data</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Gasto</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">CPM</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Conversas</th>
+                    <th className="text-center py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">Ações</th>
+                  </tr>
+                )}
               </thead>
               <tbody>
                 {data.slice(0, 20).map((row, index) => (
-                  <tr key={index} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/10 dark:hover:to-purple-900/10 transition-all duration-200 group/row">
+                  <tr
+                    key={index}
+                    className="border-b border-gray-100 dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/10 dark:hover:to-purple-900/10 transition-all duration-200 group/row"
+                  >
                     <td className="py-3 px-4">
                       <div className="flex items-center space-x-2">
                         <div className="min-w-0 flex-1">
@@ -148,16 +175,19 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                         )}
                       </div>
                     </td>
+                    {section === 'anuncios' && (
+                      <td className="py-3 px-2">
+                        {row.thumbnailUrl ? (
+                          <img src={row.thumbnailUrl} alt="thumb" className="w-10 h-10 rounded" />
+                        ) : (
+                          <span className="text-xs text-gray-500">N/A</span>
+                        )}
+                      </td>
+                    )}
+
                     <td className="py-3 px-2">
                       <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
                         {row.day || 'N/A'}
-                      </div>
-                    </td>
-
-
-                    <td className="py-3 px-2">
-                      <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
-                        {row.accountName || 'N/A'}
                       </div>
                     </td>
 
@@ -170,28 +200,46 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                     <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
                       {calculateCTR(row.clicks, row.impressions)}%
                     </td>
-                    <td className="py-3 px-2 text-right">
-                      <div className="font-medium text-gray-900 dark:text-gray-100 text-xs">
-                        {formatCurrency(row.amountSpent)}
-                      </div>
-                    </td>
-                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
-                      {typeof row.cpm === 'number' && !isNaN(row.cpm) ? `R$ ${row.cpm.toFixed(2)}` : 'R$ 0,00'}
-                    </td>
+                    {section === 'anuncios' && (
+                      <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                        {formatNumber(row.frequency)}
+                      </td>
+                    )}
+                    {section === 'campanhas' && (
+                      <>
+                        <td className="py-3 px-2 text-right">
+                          <div className="font-medium text-gray-900 dark:text-gray-100 text-xs">
+                            {formatCurrency(row.amountSpent)}
+                          </div>
+                        </td>
+                        <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                          {typeof row.cpm === 'number' && !isNaN(row.cpm) ? `R$ ${row.cpm.toFixed(2)}` : 'R$ 0,00'}
+                        </td>
+                      </>
+                    )}
                     <td className="py-3 px-2 text-right">
                       <div className="font-medium text-gray-900 dark:text-gray-100 text-xs">
                         {formatNumber(row.actionMessagingConversationsStarted)}
                       </div>
                     </td>
-                    <td className="py-3 px-2 text-center">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="hover:bg-blue-50 dark:hover:bg-blue-900/20 h-6 w-6 p-0 transition-all duration-200 hover:scale-110"
-                      >
-                        <MoreHorizontal className="w-3 h-3" />
-                      </Button>
+                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                      {formatCurrency(
+                        row.actionMessagingConversationsStarted > 0
+                          ? row.amountSpent / row.actionMessagingConversationsStarted
+                          : 0
+                      )}
                     </td>
+                    {section === 'campanhas' && (
+                      <td className="py-3 px-2 text-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="hover:bg-blue-50 dark:hover:bg-blue-900/20 h-6 w-6 p-0 transition-all duration-200 hover:scale-110"
+                        >
+                          <MoreHorizontal className="w-3 h-3" />
+                        </Button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
