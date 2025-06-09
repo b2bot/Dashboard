@@ -27,7 +27,6 @@ const Index = () => {
   const { currentSheetRange, platformConfig, section } = usePlatformNavigation();
   const { filters } = useFilters();
   const { data, isLoading, error } = useSheetData(currentSheetId, currentSheetRange);
-
   const [selectedItem, setSelectedItem] = React.useState<string>('all');
   
   const {
@@ -44,7 +43,7 @@ const Index = () => {
   // Reset navigation when section changes
   React.useEffect(() => {
     resetNavigation();
-    setSelectedItem('all');
+	setSelectedItem('all');
   }, [section, resetNavigation]);
 
   // Apply filters to data
@@ -103,12 +102,7 @@ const Index = () => {
   };
 
   const groupKey = getGroupKey(section);
-
-
-  const metricsData = useMemo(() => {
-    if (selectedItem === 'all') return filteredData;
-    return filteredData.filter((r) => String(r[groupKey]) === selectedItem);
-
+  
   const uniqueItems = useMemo(
     () => [...new Set(filteredData.map((r) => r[groupKey] as string))].filter(Boolean),
     [filteredData, groupKey]
@@ -117,8 +111,8 @@ const Index = () => {
   const metricsData = useMemo(() => {
     if (selectedItem === 'all') return filteredData;
     return filteredData.filter((r) => r[groupKey] === selectedItem);
-
   }, [filteredData, selectedItem, groupKey]);
+
 
   // Build a composite identifier so names with the same label under different
   // parents are treated as unique groups
@@ -172,12 +166,6 @@ const Index = () => {
     return base;
   });
   }, [groupedData, groupKey, section]);
-
-  const uniqueItems = useMemo(
-    () =>
-      [...new Set(aggregatedData.map((r) => String(r[groupKey] || '')))].filter(Boolean),
-    [aggregatedData, groupKey]
-  );
 
   // Loading skeleton component
   const LoadingSkeleton = () => (
@@ -290,12 +278,12 @@ const Index = () => {
         {/* Filters and Platform header */}
         <div className="py-3">
           <div className="flex flex-col lg:flex-row gap-3 items-start justify-start">
-            {/*
+		    {/*
             <div className="flex-1">
               <AdvancedFilters data={data || []} platformName={platformConfig?.name} />
             </div>
-            */}
-            <div className="w-full lg:w-64">
+			*/}
+			<div className="flex-1 lg:flex-none lg:ml-auto">
               <ItemLevelFilter
                 items={uniqueItems}
                 selected={selectedItem}
@@ -313,18 +301,7 @@ const Index = () => {
         </div>
 
         <div className="space-y-4 pb-8">
-
-
-          <div className="flex justify-end">
-            <ItemLevelFilter
-              items={uniqueItems}
-              selected={selectedItem}
-              onChange={setSelectedItem}
-              label={section === 'campanhas' ? 'Campanha' : section === 'grupos' ? 'Grupo de Anúncio' : 'Anúncio'}
-            />
-          </div>
-
-
+          
           {/* Metrics Grid - Layout conforme imagem */}
           <MetricsGrid data={metricsData} section={section} />
           
