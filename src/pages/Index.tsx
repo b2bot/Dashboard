@@ -104,9 +104,20 @@ const Index = () => {
 
   const groupKey = getGroupKey(section);
 
+
   const metricsData = useMemo(() => {
     if (selectedItem === 'all') return filteredData;
     return filteredData.filter((r) => String(r[groupKey]) === selectedItem);
+
+  const uniqueItems = useMemo(
+    () => [...new Set(filteredData.map((r) => r[groupKey] as string))].filter(Boolean),
+    [filteredData, groupKey]
+  );
+
+  const metricsData = useMemo(() => {
+    if (selectedItem === 'all') return filteredData;
+    return filteredData.filter((r) => r[groupKey] === selectedItem);
+
   }, [filteredData, selectedItem, groupKey]);
 
   // Build a composite identifier so names with the same label under different
@@ -302,6 +313,17 @@ const Index = () => {
         </div>
 
         <div className="space-y-4 pb-8">
+
+
+          <div className="flex justify-end">
+            <ItemLevelFilter
+              items={uniqueItems}
+              selected={selectedItem}
+              onChange={setSelectedItem}
+              label={section === 'campanhas' ? 'Campanha' : section === 'grupos' ? 'Grupo de Anúncio' : 'Anúncio'}
+            />
+          </div>
+
 
           {/* Metrics Grid - Layout conforme imagem */}
           <MetricsGrid data={metricsData} section={section} />

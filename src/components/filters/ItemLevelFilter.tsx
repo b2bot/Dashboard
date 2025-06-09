@@ -10,6 +10,7 @@ interface ItemLevelFilterProps {
 
 const ItemLevelFilter = ({ items, selected, onChange, label }: ItemLevelFilterProps) => {
   return (
+
     <div className="flex items-center gap-2 w-64 min-w-[12rem]">
       {label && (
         <label htmlFor="item-filter" className="text-sm font-medium text-gray-700 whitespace-nowrap">
@@ -21,14 +22,24 @@ const ItemLevelFilter = ({ items, selected, onChange, label }: ItemLevelFilterPr
           id="item-filter"
           className="flex-1 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-9"
         >
+
+    <div className="w-full sm:w-64">
+      {label && <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
+      <Select value={selected} onValueChange={onChange}>
+        <SelectTrigger className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-9">
+
           <SelectValue placeholder="Todos" />
         </SelectTrigger>
         <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <SelectItem value="all">Todos</SelectItem>
           {items.map((item) => (
+
             <SelectItem key={item} value={item}>
               {item}
             </SelectItem>
+
+            <SelectItem key={item} value={item}>{item}</SelectItem>
+
           ))}
         </SelectContent>
       </Select>
