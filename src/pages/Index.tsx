@@ -104,6 +104,11 @@ const Index = () => {
 
   const groupKey = getGroupKey(section);
 
+
+  const metricsData = useMemo(() => {
+    if (selectedItem === 'all') return filteredData;
+    return filteredData.filter((r) => String(r[groupKey]) === selectedItem);
+
   const uniqueItems = useMemo(
     () => [...new Set(filteredData.map((r) => r[groupKey] as string))].filter(Boolean),
     [filteredData, groupKey]
@@ -112,6 +117,7 @@ const Index = () => {
   const metricsData = useMemo(() => {
     if (selectedItem === 'all') return filteredData;
     return filteredData.filter((r) => r[groupKey] === selectedItem);
+
   }, [filteredData, selectedItem, groupKey]);
 
   // Build a composite identifier so names with the same label under different
@@ -163,9 +169,15 @@ const Index = () => {
         base.adSetName = rows[0].adSetName;
       }
 
-      return base;
-    });
+    return base;
+  });
   }, [groupedData, groupKey, section]);
+
+  const uniqueItems = useMemo(
+    () =>
+      [...new Set(aggregatedData.map((r) => String(r[groupKey] || '')))].filter(Boolean),
+    [aggregatedData, groupKey]
+  );
 
   // Loading skeleton component
   const LoadingSkeleton = () => (
@@ -277,16 +289,32 @@ const Index = () => {
       <main className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Filters and Platform header */}
         <div className="py-3">
-          <div className="flex flex-col lg:flex-row gap-3 items-start">
-		    {/*
+          <div className="flex flex-col lg:flex-row gap-3 items-start justify-start">
+            {/*
             <div className="flex-1">
               <AdvancedFilters data={data || []} platformName={platformConfig?.name} />
             </div>
-			*/}
+            */}
+            <div className="w-full lg:w-64">
+              <ItemLevelFilter
+                items={uniqueItems}
+                selected={selectedItem}
+                onChange={setSelectedItem}
+                label={
+                  section === 'campanhas'
+                    ? 'Campanha'
+                    : section === 'grupos'
+                      ? 'Grupo de Anúncio'
+                      : 'Anúncio'
+                }
+              />
+            </div>
           </div>
         </div>
 
         <div className="space-y-4 pb-8">
+
+
           <div className="flex justify-end">
             <ItemLevelFilter
               items={uniqueItems}
@@ -295,6 +323,7 @@ const Index = () => {
               label={section === 'campanhas' ? 'Campanha' : section === 'grupos' ? 'Grupo de Anúncio' : 'Anúncio'}
             />
           </div>
+
 
           {/* Metrics Grid - Layout conforme imagem */}
           <MetricsGrid data={metricsData} section={section} />
