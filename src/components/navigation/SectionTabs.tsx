@@ -31,7 +31,9 @@ const SectionTabs = ({ accounts, data }: SectionTabsProps) => {
     const csvContent = [
       headers.join(','),
       ...data.map(row =>
-        headers.map(header => `"${(row as Record<string, unknown>)[header]}"`).join(',')
+
+        headers.map(header => `"${row[header]}"`).join(',')
+
       )
     ].join('\n');
 
