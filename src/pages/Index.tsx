@@ -20,12 +20,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { isWithinInterval, parseISO } from 'date-fns';
+import ItemLevelFilter from '@/components/filters/ItemLevelFilter';
 
 const Index = () => {
   const { currentSheetId } = useClientManager();
   const { currentSheetRange, platformConfig, section } = usePlatformNavigation();
   const { filters } = useFilters();
   const { data, isLoading, error } = useSheetData(currentSheetId, currentSheetRange);
+
+  const [selectedItem, setSelectedItem] = React.useState<string>('all');
   
   const {
     viewLevel,
@@ -41,6 +44,7 @@ const Index = () => {
   // Reset navigation when section changes
   React.useEffect(() => {
     resetNavigation();
+    setSelectedItem('all');
   }, [section, resetNavigation]);
 
   // Apply filters to data
@@ -99,6 +103,16 @@ const Index = () => {
   };
 
   const groupKey = getGroupKey(section);
+
+  const uniqueItems = useMemo(
+    () => [...new Set(filteredData.map((r) => r[groupKey] as string))].filter(Boolean),
+    [filteredData, groupKey]
+  );
+
+  const metricsData = useMemo(() => {
+    if (selectedItem === 'all') return filteredData;
+    return filteredData.filter((r) => r[groupKey] === selectedItem);
+  }, [filteredData, selectedItem, groupKey]);
 
   // Build a composite identifier so names with the same label under different
   // parents are treated as unique groups
@@ -273,17 +287,25 @@ const Index = () => {
         </div>
 
         <div className="space-y-4 pb-8">
-          
+          <div className="flex justify-end">
+            <ItemLevelFilter
+              items={uniqueItems}
+              selected={selectedItem}
+              onChange={setSelectedItem}
+              label={section === 'campanhas' ? 'Campanha' : section === 'grupos' ? 'Grupo de Anúncio' : 'Anúncio'}
+            />
+          </div>
+
           {/* Metrics Grid - Layout conforme imagem */}
-          <MetricsGrid data={filteredData} section={section} />
+          <MetricsGrid data={metricsData} section={section} />
           
           {/* Charts com altura reduzida */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="lg:col-span-2">
-              <CampaignCharts data={filteredData} />
+              <CampaignCharts data={metricsData} />
             </div>
             <div className="lg:col-span-1">
-              <FunnelVisualization data={filteredData} />
+              <FunnelVisualization data={metricsData} />
             </div>
           </div>
           
