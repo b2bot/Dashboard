@@ -1,7 +1,17 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { SheetRow } from '@/hooks/useSheetData';
 
 interface CampaignChartsProps {
@@ -16,41 +26,21 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
       existingDay.impressions += row.impressions;
       existingDay.clicks += row.clicks;
       existingDay.spent += row.amountSpent;
-      existingDay.conversations += row.messagingConversations;
+      existingDay.conversations +=
+        row.actionMessagingConversationsStarted || 0;
     } else {
       acc.push({
         day: row.day,
         impressions: row.impressions,
         clicks: row.clicks,
         spent: row.amountSpent,
-        conversations: row.messagingConversations,
+        conversations: row.actionMessagingConversationsStarted || 0,
       });
     }
     return acc;
   }, [] as Array<{day: string, impressions: number, clicks: number, spent: number, conversations: number}>)
   .sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime());
 
-  // Agregar dados por plataforma
-  const platformData = data.reduce((acc, row) => {
-    const platform = row.devicePlatform || 'Não especificado';
-    const existing = acc.find(p => p.name === platform);
-    if (existing) {
-      existing.value += row.amountSpent;
-    } else {
-      acc.push({
-        name: platform,
-        value: row.amountSpent,
-        color: getRandomColor(platform),
-      });
-    }
-    return acc;
-  }, [] as Array<{name: string, value: number, color: string}>);
-
-  function getRandomColor(platform: string) {
-    const colors = ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444', '#06B6D4'];
-    const index = platform.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-    return colors[index];
-  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -109,59 +99,6 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
                 />
               </AreaChart>
             </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Gráfico de Gasto por Plataforma */}
-      <Card className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Gasto por Plataforma
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={platformData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={25}
-                  outerRadius={60}
-                  paddingAngle={2}
-                  dataKey="value"
-                >
-                  {platformData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  formatter={(value: number) => [`R$ ${value.toFixed(2)}`, 'Gasto']}
-                  contentStyle={{ 
-                    backgroundColor: 'var(--background)', 
-                    border: '1px solid var(--border)',
-                    borderRadius: '8px',
-                    fontSize: '12px'
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-2 space-y-1">
-              {platformData.map((platform, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div 
-                      className="w-2 h-2 rounded-full" 
-                      style={{ backgroundColor: platform.color }}
-                    />
-                    <span className="text-xs text-gray-600 dark:text-gray-400 truncate">{platform.name}</span>
-                  </div>
-                  <span className="text-xs font-medium text-gray-900 dark:text-gray-100">R$ {platform.value.toFixed(2)}</span>
-                </div>
-              ))}
-            </div>
           </div>
         </CardContent>
       </Card>

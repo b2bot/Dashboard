@@ -24,7 +24,7 @@ const DashboardFilters = ({
   onPeriodChange,
 }: DashboardFiltersProps) => {
   const uniqueCampaigns = [...new Set(data.map(row => row.campaignName))].filter(Boolean);
-  const uniquePlatforms = [...new Set(data.map(row => row.devicePlatform))].filter(Boolean);
+  const uniquePlatforms: string[] = [];
   const uniqueDays = [...new Set(data.map(row => row.day))].filter(Boolean).sort();
 
   return (
@@ -74,24 +74,7 @@ const DashboardFilters = ({
           </Select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Plataforma
-          </label>
-          <Select value={selectedPlatform} onValueChange={onPlatformChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Todas as plataformas" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas as plataformas</SelectItem>
-              {uniquePlatforms.map((platform) => (
-                <SelectItem key={platform} value={platform}>
-                  {platform}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Plataforma filter removed due to missing platform data */}
       </div>
     </div>
   );

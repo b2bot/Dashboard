@@ -11,18 +11,6 @@ interface CampaignTableProps {
 }
 
 const CampaignTable = ({ data }: CampaignTableProps) => {
-  const getDevicePlatformBadge = (platform: string) => {
-    const colors: { [key: string]: string } = {
-      'mobile_app': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
-      'mobile_web': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-      'desktop': 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400',
-      'instagram': 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400',
-      'facebook': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400',
-    };
-
-    const colorClass = colors[platform] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
-    return <Badge className={`${colorClass} text-xs px-2 py-0.5 transition-all duration-200 hover:scale-105`}>{platform || 'N/A'}</Badge>;
-  };
 
   const calculateCTR = (clicks: number, impressions: number) => {
     return impressions > 0 ? ((clicks / impressions) * 100).toFixed(2) : '0.00';
@@ -66,7 +54,6 @@ const CampaignTable = ({ data }: CampaignTableProps) => {
                 <tr className="border-b border-gray-200 dark:border-gray-700">
                   <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[200px]">Campanha</th>
                   <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Data</th>
-                  <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[120px]">Plataforma</th>
                   <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
                   <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
                   <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
@@ -115,9 +102,6 @@ const CampaignTable = ({ data }: CampaignTableProps) => {
                         {row.day || 'N/A'}
                       </div>
                     </td>
-                    <td className="py-3 px-2">
-                      {getDevicePlatformBadge(row.devicePlatform)}
-                    </td>
                     <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
                       {formatNumber(row.impressions)}
                     </td>
@@ -136,17 +120,9 @@ const CampaignTable = ({ data }: CampaignTableProps) => {
                       {typeof row.cpm === 'number' && !isNaN(row.cpm) ? `R$ ${row.cpm.toFixed(2)}` : 'R$ 0,00'}
                     </td>
                     <td className="py-3 px-2 text-right">
-                      <div className="font-medium text-gray-900 dark:text-gray-100 text-xs">{formatNumber(row.messagingConversations)}</div>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 cursor-help truncate">
-                            {truncateText(row.conversionDevice || 'N/A', 12)}
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent className="bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 p-2 rounded-lg shadow-lg">
-                          <p>{row.conversionDevice || 'N/A'}</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      <div className="font-medium text-gray-900 dark:text-gray-100 text-xs">
+                        {formatNumber(row.actionMessagingConversationsStarted)}
+                      </div>
                     </td>
                     <td className="py-3 px-2 text-center">
                       <Button 
