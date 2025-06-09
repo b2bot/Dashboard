@@ -9,6 +9,8 @@ export interface CampaignGroup {
   totalClicks: number;
   totalSpent: number;
   totalConversions: number;
+  totalActionLinkClicks: number;
+  totalFrequency: number;
 }
 
 export interface AdSetGroup {
@@ -19,6 +21,8 @@ export interface AdSetGroup {
   totalClicks: number;
   totalSpent: number;
   totalConversions: number;
+  totalActionLinkClicks: number;
+  totalFrequency: number;
 }
 
 export interface AdGroup {
@@ -30,6 +34,8 @@ export interface AdGroup {
   clicks: number;
   spent: number;
   conversions: number;
+  actionLinkClicks: number;
+  frequency: number;
 }
 
 export const useHierarchicalData = (data: SheetRow[]) => {
@@ -47,6 +53,8 @@ export const useHierarchicalData = (data: SheetRow[]) => {
           totalClicks: 0,
           totalSpent: 0,
           totalConversions: 0,
+          totalActionLinkClicks: 0,
+          totalFrequency: 0,
         };
       }
 
@@ -55,6 +63,8 @@ export const useHierarchicalData = (data: SheetRow[]) => {
       campaign.totalClicks += row.clicks || 0;
       campaign.totalSpent += row.amountSpent || 0;
       campaign.totalConversions += row.actionMessagingConversationsStarted || 0;
+      campaign.totalActionLinkClicks += row.actionLinkClicks || 0;
+      campaign.totalFrequency += row.frequency || 0;
 
       // Find or create ad set
       let adSet = campaign.adSets.find(as => as.adSetName === row.adSetName);
@@ -67,6 +77,8 @@ export const useHierarchicalData = (data: SheetRow[]) => {
           totalClicks: 0,
           totalSpent: 0,
           totalConversions: 0,
+          totalActionLinkClicks: 0,
+          totalFrequency: 0,
         };
         campaign.adSets.push(adSet);
       }
@@ -76,6 +88,8 @@ export const useHierarchicalData = (data: SheetRow[]) => {
         adSet.totalClicks += row.clicks || 0;
         adSet.totalSpent += row.amountSpent || 0;
         adSet.totalConversions += row.actionMessagingConversationsStarted || 0;
+        adSet.totalActionLinkClicks += row.actionLinkClicks || 0;
+        adSet.totalFrequency += row.frequency || 0;
 
         // Create ad entry if adName exists
         if (row.adName) {
@@ -90,6 +104,8 @@ export const useHierarchicalData = (data: SheetRow[]) => {
               clicks: row.clicks || 0,
               spent: row.amountSpent || 0,
               conversions: row.actionMessagingConversationsStarted || 0,
+              actionLinkClicks: row.actionLinkClicks || 0,
+              frequency: row.frequency || 0,
             });
           }
         }

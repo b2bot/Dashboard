@@ -274,7 +274,7 @@ const Index = () => {
         <div className="space-y-4 pb-8">
           
           {/* Metrics Grid - Layout conforme imagem */}
-          <MetricsGrid data={filteredData} />
+          <MetricsGrid data={filteredData} section={section} />
           
           {/* Charts com altura reduzida */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

@@ -2,8 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ChevronRight, Eye, Users, MousePointer, DollarSign } from 'lucide-react';
+import { Eye, Users, MousePointer, Zap } from 'lucide-react';
 import { CampaignGroup } from '@/hooks/useHierarchicalData';
 
 interface CampaignLevelProps {
@@ -32,7 +31,7 @@ const CampaignLevel = ({ campaigns, onCampaignClick }: CampaignLevelProps) => {
                   </Badge>
                 </div>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                   <div className="flex items-center space-x-2">
                     <Eye className="w-4 h-4 text-blue-500" />
                     <div>
@@ -40,7 +39,7 @@ const CampaignLevel = ({ campaigns, onCampaignClick }: CampaignLevelProps) => {
                       <p className="font-semibold">{formatNumber(campaign.totalImpressions)}</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <MousePointer className="w-4 h-4 text-green-500" />
                     <div>
@@ -48,15 +47,7 @@ const CampaignLevel = ({ campaigns, onCampaignClick }: CampaignLevelProps) => {
                       <p className="font-semibold">{formatNumber(campaign.totalClicks)}</p>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <DollarSign className="w-4 h-4 text-red-500" />
-                    <div>
-                      <p className="text-sm text-gray-500">Gasto</p>
-                      <p className="font-semibold">{formatCurrency(campaign.totalSpent)}</p>
-                    </div>
-                  </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <Users className="w-4 h-4 text-purple-500" />
                     <div>
@@ -64,18 +55,38 @@ const CampaignLevel = ({ campaigns, onCampaignClick }: CampaignLevelProps) => {
                       <p className="font-semibold">{formatNumber(campaign.totalConversions)}</p>
                     </div>
                   </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Zap className="w-4 h-4 text-orange-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Taxa de Conversão</p>
+                      <p className="font-semibold">
+                        {formatNumber(
+                          campaign.totalActionLinkClicks > 0
+                            ? (campaign.totalConversions / campaign.totalActionLinkClicks) * 100
+                            : 0
+                        )}%
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Zap className="w-4 h-4 text-red-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Custo/Conversão</p>
+                      <p className="font-semibold">
+                        {formatCurrency(
+                          campaign.totalConversions > 0
+                            ? campaign.totalSpent / campaign.totalConversions
+                            : 0
+                        )}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
               
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onCampaignClick(campaign)}
-                className="ml-4 hover:bg-gray-100"
-              >
-                Ver grupos
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
+              
             </div>
           </CardContent>
         </Card>

@@ -4,19 +4,22 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Eye, MousePointer, DollarSign, Users, Target, Zap } from 'lucide-react';
 import { SheetRow } from '@/hooks/useSheetData';
+import { TabSection } from '@/hooks/usePlatformNavigation';
 
 interface MetricsGridProps {
   data: SheetRow[];
+  section?: TabSection;
 }
 
-const MetricsGrid = ({ data }: MetricsGridProps) => {
+const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
   const totalImpressions = data.reduce((sum, row) => sum + (row.impressions || 0), 0);
   const totalClicks = data.reduce((sum, row) => sum + (row.clicks || 0), 0);
   const totalInvestment = data.reduce((sum, row) => sum + (row.amountSpent || 0), 0);
   const totalConversions = data.reduce((sum, row) => sum + (row.actionMessagingConversationsStarted || 0), 0);
-  const totalCostPerConversion = data.length > 0 ? 
+  const totalCostPerConversion = data.length > 0 ?
     data.reduce((sum, row) => sum + (row.costPerActionMessagingConversations || 0), 0) / data.length : 0;
   const totalActionLinkClicks = data.reduce((sum, row) => sum + (row.actionLinkClicks || 0), 0);
+  const totalFrequency = data.reduce((sum, row) => sum + (row.frequency || 0), 0);
   
   // Taxa de conversão: Conversões ÷ Action Link Clicks
   const conversionRate = totalActionLinkClicks > 0 ? (totalConversions / totalActionLinkClicks) * 100 : 0;
@@ -28,7 +31,7 @@ const MetricsGrid = ({ data }: MetricsGridProps) => {
   }).format(num) : 'R$ 0,00';
   const formatPercentage = (num: number) => num ? `${num.toFixed(2)}%` : '0,00%';
 
-  const metrics = [
+  const campaignMetrics = [
     {
       title: 'Impressões',
       value: formatNumber(totalImpressions),
@@ -66,6 +69,15 @@ const MetricsGrid = ({ data }: MetricsGridProps) => {
       trendUp: true,
     },
     {
+      title: 'Taxa de Conversão',
+      value: formatPercentage(conversionRate),
+      icon: Users,
+      color: 'text-indigo-600 dark:text-indigo-400',
+      bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
+      trend: '+0.8%',
+      trendUp: true,
+    },
+    {
       title: 'Custo/Conversão',
       value: formatCurrency(totalCostPerConversion),
       icon: Zap,
@@ -73,6 +85,45 @@ const MetricsGrid = ({ data }: MetricsGridProps) => {
       bgColor: 'bg-orange-50 dark:bg-orange-900/20',
       trend: '-2.1%',
       trendUp: false,
+    },
+  ];
+
+  const groupMetrics = [
+    {
+      title: 'Impressões',
+      value: formatNumber(totalImpressions),
+      icon: Eye,
+      color: 'text-blue-600 dark:text-blue-400',
+      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+      trend: '+12.5%',
+      trendUp: true,
+    },
+    {
+      title: 'Cliques',
+      value: formatNumber(totalClicks),
+      icon: MousePointer,
+      color: 'text-green-600 dark:text-green-400',
+      bgColor: 'bg-green-50 dark:bg-green-900/20',
+      trend: '+8.2%',
+      trendUp: true,
+    },
+    {
+      title: 'Frequência',
+      value: formatNumber(totalFrequency / (data.length || 1)),
+      icon: DollarSign,
+      color: 'text-red-600 dark:text-red-400',
+      bgColor: 'bg-red-50 dark:bg-red-900/20',
+      trend: '+3.1%',
+      trendUp: true,
+    },
+    {
+      title: 'Conversões',
+      value: formatNumber(totalConversions),
+      icon: Target,
+      color: 'text-purple-600 dark:text-purple-400',
+      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+      trend: '+15.7%',
+      trendUp: true,
     },
     {
       title: 'Taxa de Conversão',
@@ -83,7 +134,18 @@ const MetricsGrid = ({ data }: MetricsGridProps) => {
       trend: '+0.8%',
       trendUp: true,
     },
+    {
+      title: 'Custo/Conversão',
+      value: formatCurrency(totalCostPerConversion),
+      icon: Zap,
+      color: 'text-orange-600 dark:text-orange-400',
+      bgColor: 'bg-orange-50 dark:bg-orange-900/20',
+      trend: '-2.1%',
+      trendUp: false,
+    },
   ];
+
+  const metrics = section === 'campanhas' ? campaignMetrics : groupMetrics;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-6">
