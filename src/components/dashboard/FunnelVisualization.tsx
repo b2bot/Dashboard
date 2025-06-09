@@ -41,17 +41,23 @@ const FunnelVisualization = ({ data }: FunnelVisualizationProps) => {
 
   const middleValue = totals[middleMetric as keyof typeof totals] || 0;
   const bottomValue = totals[bottomMetric as keyof typeof totals] || 0;
-  const maxValue = Math.max(totals.impressions, middleValue, bottomValue);
 
-  const computeWidth = (value: number) => {
-    if (!maxValue) return '100%';
-    const percent = (value / maxValue) * 100;
-    const minWidth = 30;
-    return `${percent < minWidth ? minWidth : percent}%`;
+  const computeWidth = (value: number, previous?: number) => {
+    if (!previous) return '100%';
+    const minWidth = 25;
+    const percent = previous > 0 ? (value / previous) * 100 : 0;
+    const clamped = Math.max(minWidth, Math.min(100, percent));
+    return `${clamped}%`;
   };
 
-  const conversionRate = (current: number, previous: number) =>
-    previous > 0 ? ((current / previous) * 100).toFixed(1) : '0';
+  const conversionRate = (current: number, previous: number) => {
+    if (previous === 0) return '0.0';
+    const rate = (current / previous) * 100;
+    return rate.toLocaleString('pt-BR', {
+      maximumFractionDigits: 1,
+      minimumFractionDigits: 1,
+    });
+  };
 
   const Block = ({
     label,
@@ -88,14 +94,19 @@ const FunnelVisualization = ({ data }: FunnelVisualizationProps) => {
       </CardHeader>
       <CardContent className="space-y-2">
         <div className="space-y-1">
-          <Block label="Impressões" value={totals.impressions} color="bg-blue-600" width={computeWidth(totals.impressions)} />
+          <Block
+            label="Impressões"
+            value={totals.impressions}
+            color="bg-blue-600"
+            width={computeWidth(totals.impressions)}
+          />
           <div className="text-center text-xs text-gray-500 dark:text-gray-400">
             {conversionRate(middleValue, totals.impressions)}% Conversão
           </div>
           <Block label={metricOptions.find(o => o.value === middleMetric)?.label || middleMetric}
             value={middleValue}
             color="bg-green-600"
-            width={computeWidth(middleValue)}
+            width={computeWidth(middleValue, totals.impressions)}
           >
             <div className="absolute top-1 right-1 text-black">
               <Select value={middleMetric} onValueChange={setMiddleMetric}>
@@ -118,7 +129,7 @@ const FunnelVisualization = ({ data }: FunnelVisualizationProps) => {
           <Block label={metricOptions.find(o => o.value === bottomMetric)?.label || bottomMetric}
             value={bottomValue}
             color="bg-purple-600"
-            width={computeWidth(bottomValue)}
+            width={computeWidth(bottomValue, middleValue)}
           >
             <div className="absolute top-1 right-1 text-black">
               <Select value={bottomMetric} onValueChange={setBottomMetric}>
