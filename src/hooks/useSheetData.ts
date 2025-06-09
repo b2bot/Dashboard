@@ -9,12 +9,21 @@ export interface SheetRow {
   impressions: number;
   clicks: number;
   amountSpent: number;
+  cpm: number;
+  cpc: number;
+  ctr: number;
   actionMessagingConversationsStarted: number;
   costPerActionMessagingConversations: number;
   actionLinkClicks: number;
   reach: number;
   frequency: number;
-  cpm: number;
+  messagingConversations: number;
+  devicePlatform: string;
+  conversionDevice: string;
+  adCreativeName: string;
+
+
+  thumbnailUrl: string;
   day: string;
   [key: string]: unknown; // Para outras colunas que possam existir
 }
@@ -44,9 +53,10 @@ export const useSheetData = (sheetId: string, range: string = 'Meta!A1:Z') => {
         
         headers.forEach((header: string, index: number) => {
           const value = row[index] || '';
-          
-          // Mapear colunas específicas
-          switch (header.toLowerCase()) {
+          const headerKey = header.toLowerCase();
+
+          // Mapear colunas específicas utilizando o nome exato do cabeçalho
+          switch (headerKey) {
             case 'account name':
               mappedRow.accountName = value;
               break;
@@ -65,11 +75,26 @@ export const useSheetData = (sheetId: string, range: string = 'Meta!A1:Z') => {
             case 'clicks':
               mappedRow.clicks = parseFloat(value) || 0;
               break;
+            case 'spend (cost, amount spent)':
             case 'amount spent':
+            case 'spend (cost, amount spent)':
               mappedRow.amountSpent = parseFloat(value) || 0;
+              break;
+            case 'cpm (cost per 1000 impressions)':
+            case 'cpm':
+              mappedRow.cpm = parseFloat(value) || 0;
+              break;
+            case 'cpc (cost per click)':
+            case 'cpc':
+              mappedRow.cpc = parseFloat(value) || 0;
+              break;
+            case 'ctr (clickthrough rate)':
+            case 'ctr':
+              mappedRow.ctr = parseFloat(value) || 0;
               break;
             case 'action messaging conversations started (onsite conversion)':
               mappedRow.actionMessagingConversationsStarted = parseFloat(value) || 0;
+              mappedRow.messagingConversations = parseFloat(value) || 0;
               break;
             case 'cost per action messaging conversations started (onsite conversion)':
               mappedRow.costPerActionMessagingConversations = parseFloat(value) || 0;
@@ -77,14 +102,43 @@ export const useSheetData = (sheetId: string, range: string = 'Meta!A1:Z') => {
             case 'action link clicks':
               mappedRow.actionLinkClicks = parseFloat(value) || 0;
               break;
+            case 'messaging conversations':
+              mappedRow.messagingConversations = parseFloat(value) || 0;
+              break;
+            case 'device platform':
+              mappedRow.devicePlatform = value;
+              break;
+            case 'conversion device':
+              mappedRow.conversionDevice = value;
+              break;
             case 'reach':
               mappedRow.reach = parseFloat(value) || 0;
               break;
             case 'frequency':
               mappedRow.frequency = parseFloat(value) || 0;
               break;
+            case 'ad creative name':
+              mappedRow.adCreativeName = value;
+              break;
+            case 'thumbnail url':
+              mappedRow.thumbnailUrl = value;
+
             case 'cpm':
+            case 'cpm (cost per 1000 impressions)':
               mappedRow.cpm = parseFloat(value) || 0;
+
+              break;
+            case 'cpc (cost per click)':
+              mappedRow.cpc = parseFloat(value) || 0;
+              break;
+            case 'ctr (clickthrough rate)':
+              mappedRow.ctr = parseFloat(value) || 0;
+              break;
+            case 'adcreative name':
+              mappedRow.adcreativeName = value;
+              break;
+            case 'thumbnail url':
+              mappedRow.thumbnailUrl = value;
               break;
             case 'day':
             case 'date':

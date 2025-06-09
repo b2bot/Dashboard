@@ -26,20 +26,48 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
       existingDay.impressions += row.impressions;
       existingDay.clicks += row.clicks;
       existingDay.spent += row.amountSpent;
+
       existingDay.conversations +=
         row.actionMessagingConversationsStarted || 0;
+
     } else {
       acc.push({
         day: row.day,
         impressions: row.impressions,
         clicks: row.clicks,
         spent: row.amountSpent,
+
         conversations: row.actionMessagingConversationsStarted || 0,
+
       });
     }
     return acc;
   }, [] as Array<{day: string, impressions: number, clicks: number, spent: number, conversations: number}>)
   .sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime());
+
+
+
+  // Agregar dados por plataforma
+  const platformData = data.reduce((acc, row) => {
+    const platform = row.accountName || 'Não especificado';
+    const existing = acc.find(p => p.name === platform);
+    if (existing) {
+      existing.value += row.amountSpent;
+    } else {
+      acc.push({
+        name: platform,
+        value: row.amountSpent,
+        color: getRandomColor(platform),
+      });
+    }
+    return acc;
+  }, [] as Array<{name: string, value: number, color: string}>);
+
+  function getRandomColor(platform: string) {
+    const colors = ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444', '#06B6D4'];
+    const index = platform.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+    return colors[index];
+  }
 
 
   return (
