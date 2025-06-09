@@ -21,6 +21,8 @@ export interface SheetRow {
   devicePlatform: string;
   conversionDevice: string;
   adCreativeName: string;
+
+
   thumbnailUrl: string;
   day: string;
   [key: string]: unknown; // Para outras colunas que possam existir
@@ -75,6 +77,7 @@ export const useSheetData = (sheetId: string, range: string = 'Meta!A1:Z') => {
               break;
             case 'spend (cost, amount spent)':
             case 'amount spent':
+            case 'spend (cost, amount spent)':
               mappedRow.amountSpent = parseFloat(value) || 0;
               break;
             case 'cpm (cost per 1000 impressions)':
@@ -116,6 +119,23 @@ export const useSheetData = (sheetId: string, range: string = 'Meta!A1:Z') => {
               break;
             case 'ad creative name':
               mappedRow.adCreativeName = value;
+              break;
+            case 'thumbnail url':
+              mappedRow.thumbnailUrl = value;
+
+            case 'cpm':
+            case 'cpm (cost per 1000 impressions)':
+              mappedRow.cpm = parseFloat(value) || 0;
+
+              break;
+            case 'cpc (cost per click)':
+              mappedRow.cpc = parseFloat(value) || 0;
+              break;
+            case 'ctr (clickthrough rate)':
+              mappedRow.ctr = parseFloat(value) || 0;
+              break;
+            case 'adcreative name':
+              mappedRow.adcreativeName = value;
               break;
             case 'thumbnail url':
               mappedRow.thumbnailUrl = value;

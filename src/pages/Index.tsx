@@ -99,19 +99,31 @@ const Index = () => {
 
   const groupKey = getGroupKey(section);
 
+  // Build a composite identifier so names with the same label under different
+  // parents are treated as unique groups
+  const buildCompositeKey = (row: SheetRow): string => {
+    if (section === 'grupos') {
+      return `${row.campaignName || 'unknown'}|${row.adSetName || 'unknown'}`;
+    }
+    if (section === 'anuncios') {
+      return `${row.campaignName || 'unknown'}|${row.adSetName || 'unknown'}|${row.adName || 'unknown'}`;
+    }
+    return `${row.campaignName || 'unknown'}`;
+  };
+
   const groupedData = useMemo(() => {
     const groups: Record<string, SheetRow[]> = {};
     filteredData.forEach((row) => {
-      const key = (row[groupKey] as string) || 'Desconhecido';
+      const key = buildCompositeKey(row);
       if (!groups[key]) groups[key] = [];
       groups[key].push(row);
     });
     return groups;
-  }, [filteredData, groupKey]);
+  }, [filteredData, section]);
 
 
   const aggregatedData = useMemo(() => {
-    return Object.entries(groupedData).map(([key, rows]) => {
+    return Object.values(groupedData).map((rows) => {
       const base = { ...rows[0] } as SheetRow;
       const sum = (field: keyof SheetRow) =>
         rows.reduce((acc, r) => acc + (Number(r[field]) || 0), 0);
@@ -125,10 +137,20 @@ const Index = () => {
       base.reach = sum('reach');
       base.frequency = sum('frequency');
       base.cpm = rows.reduce((acc, r) => acc + (r.cpm || 0), 0) / rows.length;
-      base[groupKey] = key;
+
+      // ensure we keep the original identifying values rather than the composite key
+      base[groupKey] = rows[0][groupKey];
+      if (section === 'grupos') {
+        base.campaignName = rows[0].campaignName;
+      }
+      if (section === 'anuncios') {
+        base.campaignName = rows[0].campaignName;
+        base.adSetName = rows[0].adSetName;
+      }
+
       return base;
     });
-  }, [groupedData, groupKey]);
+  }, [groupedData, groupKey, section]);
 
   // Loading skeleton component
   const LoadingSkeleton = () => (
@@ -151,7 +173,7 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 transition-colors duration-300">
         <PlatformNavigation />
-        <SectionTabs accounts={[]} />
+        <SectionTabs accounts={[]} data={[]} />
         <main className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
 		{/*
           <div className="py-3">
@@ -182,7 +204,7 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-red-50 to-orange-50 dark:from-gray-900 dark:via-red-900 dark:to-orange-900 transition-colors duration-300">
         <PlatformNavigation />
-        <SectionTabs accounts={[]} />
+        <SectionTabs accounts={[]} data={[]} />
         <main className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-6">
           {/*<AdvancedFilters data={[]} platformName={platformConfig?.name} />*/}
           <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-red-200 dark:border-red-700 mt-4">
@@ -224,18 +246,18 @@ const Index = () => {
         );
       }
     } else if (section === 'grupos') {
-      return <CampaignTable data={aggregatedData} />;
+      return <CampaignTable data={aggregatedData} section="grupos" />;
     } else if (section === 'anuncios') {
-      return <CampaignTable data={aggregatedData} />;
+      return <CampaignTable data={aggregatedData} section="anuncios" />;
     }
 
-    return <CampaignTable data={filteredData} />;
+    return <CampaignTable data={filteredData} section="campanhas" />;
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 transition-colors duration-300">
       <PlatformNavigation />
-      <SectionTabs accounts={uniqueAccounts} />
+      <SectionTabs accounts={uniqueAccounts} data={filteredData} />
       
       <main className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Filters and Platform header */}
