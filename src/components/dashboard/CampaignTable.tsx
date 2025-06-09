@@ -13,7 +13,9 @@ interface CampaignTableProps {
   section?: TabSection;
 }
 
+
 const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
+
 
   const calculateCTR = (clicks: number, impressions: number) => {
     return impressions > 0 ? ((clicks / impressions) * 100).toFixed(2) : '0.00';
@@ -67,7 +69,6 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                 <tr className="border-b border-gray-200 dark:border-gray-700">
                   <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[200px]">{firstColHeader}</th>
                   <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Data</th>
-                  <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[120px]">Plataforma</th>
                   <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
                   <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
                   <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
@@ -152,11 +153,14 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                         {row.day || 'N/A'}
                       </div>
                     </td>
+
+
                     <td className="py-3 px-2">
                       <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
                         {row.accountName || 'N/A'}
                       </div>
                     </td>
+
                     <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
                       {formatNumber(row.impressions)}
                     </td>
