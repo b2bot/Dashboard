@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, Eye, MousePointer, DollarSign, Users, Target, Zap } from 'lucide-react';
+import { TrendingUp, TrendingDown, Eye, MousePointer, DollarSign, Users, Target, Zap, Repeat } from 'lucide-react';
 import { SheetRow } from '@/hooks/useSheetData';
 import { TabSection } from '@/hooks/usePlatformNavigation';
 
@@ -109,8 +109,8 @@ const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
     },
     {
       title: 'Frequência',
-      value: formatNumber(totalFrequency / (data.length || 1)),
-      icon: DollarSign,
+      value: (totalFrequency / (data.length || 1)).toFixed(1),
+      icon: Repeat,
       color: 'text-red-600 dark:text-red-400',
       bgColor: 'bg-red-50 dark:bg-red-900/20',
       trend: '+3.1%',

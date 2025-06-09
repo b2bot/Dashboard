@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Eye, Users, MousePointer, DollarSign } from 'lucide-react';
+import { ChevronLeft, Eye, Users, MousePointer, Repeat, Zap } from 'lucide-react';
 import { AdGroup } from '@/hooks/useHierarchicalData';
 
 interface AdLevelProps {
@@ -50,7 +50,7 @@ const AdLevel = ({ ads, adSetName, campaignName, onBackClick }: AdLevelProps) =>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">{ad.name}</h3>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
                   <div className="flex items-center space-x-2">
                     <Eye className="w-4 h-4 text-blue-500" />
                     <div>
@@ -68,18 +68,40 @@ const AdLevel = ({ ads, adSetName, campaignName, onBackClick }: AdLevelProps) =>
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    <DollarSign className="w-4 h-4 text-red-500" />
+                    <Repeat className="w-4 h-4 text-red-500" />
                     <div>
-                      <p className="text-sm text-gray-500">Gasto</p>
-                      <p className="font-semibold">{formatCurrency(ad.spent)}</p>
+                      <p className="text-sm text-gray-500">Frequência</p>
+                      <p className="font-semibold">{ad.frequency.toFixed(1)}</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <Users className="w-4 h-4 text-purple-500" />
                     <div>
                       <p className="text-sm text-gray-500">Conversões</p>
                       <p className="font-semibold">{formatNumber(ad.conversions)}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Zap className="w-4 h-4 text-orange-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Taxa de Conversão</p>
+                      <p className="font-semibold">
+                        {formatNumber(
+                          ad.actionLinkClicks > 0 ? (ad.conversions / ad.actionLinkClicks) * 100 : 0
+                        )}%
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Zap className="w-4 h-4 text-red-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Custo/Conversão</p>
+                      <p className="font-semibold">
+                        {formatCurrency(ad.conversions > 0 ? ad.spent / ad.conversions : 0)}
+                      </p>
                     </div>
                   </div>
                 </div>

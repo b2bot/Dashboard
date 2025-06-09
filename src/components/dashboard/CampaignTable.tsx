@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 import { MoreHorizontal, TrendingUp, TrendingDown } from 'lucide-react';
 import { SheetRow } from '@/hooks/useSheetData';
 
@@ -68,8 +69,7 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
               <thead>
                 {section === 'grupos' ? (
                   <tr className="border-b border-gray-200 dark:border-gray-700">
-                    <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[200px]">Grupo de Anúncio</th>
-                    <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Data</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[220px]">Grupo de Anúncio</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
@@ -80,7 +80,6 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                   <tr className="border-b border-gray-200 dark:border-gray-700">
                     <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[180px]">Anúncio</th>
                     <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">Criativo</th>
-                    <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Data</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
@@ -178,18 +177,30 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                     {section === 'anuncios' && (
                       <td className="py-3 px-2">
                         {row.thumbnailUrl ? (
-                          <img src={row.thumbnailUrl} alt="thumb" className="w-10 h-10 rounded" />
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <img
+                                src={row.thumbnailUrl}
+                                alt="thumb"
+                                className="w-10 h-10 rounded cursor-pointer"
+                              />
+                            </DialogTrigger>
+                            <DialogContent className="p-0 bg-transparent border-none max-w-max">
+                              <img src={row.thumbnailUrl} alt="preview" className="max-w-full h-auto" />
+                            </DialogContent>
+                          </Dialog>
                         ) : (
                           <span className="text-xs text-gray-500">N/A</span>
                         )}
                       </td>
                     )}
-
-                    <td className="py-3 px-2">
-                      <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
-                        {row.day || 'N/A'}
-                      </div>
-                    </td>
+                    {section === 'campanhas' && (
+                      <td className="py-3 px-2">
+                        <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
+                          {row.day || 'N/A'}
+                        </div>
+                      </td>
+                    )}
 
                     <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
                       {formatNumber(row.impressions)}

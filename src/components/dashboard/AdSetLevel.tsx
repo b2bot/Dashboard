@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, ChevronLeft, Eye, Users, MousePointer, DollarSign } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Eye, Users, MousePointer, Repeat, Zap } from 'lucide-react';
 import { AdSetGroup } from '@/hooks/useHierarchicalData';
 
 interface AdSetLevelProps {
@@ -52,7 +52,7 @@ const AdSetLevel = ({ adSets, campaignName, onAdSetClick, onBackClick }: AdSetLe
                   </Badge>
                 </div>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
                   <div className="flex items-center space-x-2">
                     <Eye className="w-4 h-4 text-blue-500" />
                     <div>
@@ -70,18 +70,44 @@ const AdSetLevel = ({ adSets, campaignName, onAdSetClick, onBackClick }: AdSetLe
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    <DollarSign className="w-4 h-4 text-red-500" />
+                    <Repeat className="w-4 h-4 text-red-500" />
                     <div>
-                      <p className="text-sm text-gray-500">Gasto</p>
-                      <p className="font-semibold">{formatCurrency(adSet.totalSpent)}</p>
+                      <p className="text-sm text-gray-500">Frequência</p>
+                      <p className="font-semibold">{(adSet.totalFrequency / adSet.ads.length).toFixed(1)}</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <Users className="w-4 h-4 text-purple-500" />
                     <div>
                       <p className="text-sm text-gray-500">Conversões</p>
                       <p className="font-semibold">{formatNumber(adSet.totalConversions)}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Zap className="w-4 h-4 text-orange-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Taxa de Conversão</p>
+                      <p className="font-semibold">
+                        {formatNumber(
+                          adSet.totalActionLinkClicks > 0
+                            ? (adSet.totalConversions / adSet.totalActionLinkClicks) * 100
+                            : 0
+                        )}%
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Zap className="w-4 h-4 text-red-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Custo/Conversão</p>
+                      <p className="font-semibold">
+                        {formatCurrency(
+                          adSet.totalConversions > 0 ? adSet.totalSpent / adSet.totalConversions : 0
+                        )}
+                      </p>
                     </div>
                   </div>
                 </div>
