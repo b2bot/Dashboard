@@ -13,34 +13,25 @@ import { usePlatformNavigation, TabSection } from '@/hooks/usePlatformNavigation
 import { BarChart3, Users, Target, Download } from 'lucide-react';
 import DateRangePicker from '@/components/filters/DateRangePicker';
 import { Button } from '@/components/ui/button';
-import { SheetRow, useSheetData } from '@/hooks/useSheetData';
+import { SheetRow } from '@/hooks/useSheetData';
 
 interface SectionTabsProps {
   accounts: string[];
+  data: SheetRow[];
 }
 
-const SectionTabs = ({ accounts }: SectionTabsProps) => {
+const SectionTabs = ({ accounts, data }: SectionTabsProps) => {
   const { section, setSection } = usePlatformNavigation();
   const { filters, updateFilters } = useFilters();
-  const { data } = useSheetData();
 
   const handleExport = () => {
-    const filteredData = data.filter(row => {
-      if (filters.searchTerm) {
-        const searchLower = filters.searchTerm.toLowerCase();
-        const searchableText = `${row.campaignName} ${row.adSetName} ${row.adName} ${row.accountName}`.toLowerCase();
-        if (!searchableText.includes(searchLower)) return false;
-      }
-      return true;
-    });
+    if (data.length === 0) return;
 
-    if (filteredData.length === 0) return;
-
-    const headers = Object.keys(filteredData[0]);
+    const headers = Object.keys(data[0]);
     const csvContent = [
       headers.join(','),
-      ...filteredData.map(row =>
-        headers.map(header => `"${row[header]}"`).join(',')
+      ...data.map(row =>
+        headers.map(header => `"${(row as Record<string, unknown>)[header]}"`).join(',')
       )
     ].join('\n');
 
