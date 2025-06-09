@@ -73,7 +73,7 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       {/* Gráfico de Performance por Data */}
-      <Card className="col-span-1 lg:col-span-2 group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+      <Card className="col-span-1 lg:col-span-3 group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Performance por Data
