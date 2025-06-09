@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -8,6 +9,7 @@ interface FunnelVisualizationProps {
 }
 
 const metricOptions = [
+  { value: 'impressions', label: 'Impressões' },
   { value: 'clicks', label: 'Cliques' },
   { value: 'actionLinkClicks', label: 'Link Clicks' },
   { value: 'actionMessagingConversationsStarted', label: 'Conversas' },
@@ -22,6 +24,7 @@ const formatCurrency = (num: number) =>
     : 'R$ 0,00';
 
 const FunnelVisualization = ({ data }: FunnelVisualizationProps) => {
+  const [topMetric, setTopMetric] = useState('impressions');
   const [middleMetric, setMiddleMetric] = useState('clicks');
   const [bottomMetric, setBottomMetric] = useState('actionMessagingConversationsStarted');
 
@@ -39,16 +42,9 @@ const FunnelVisualization = ({ data }: FunnelVisualizationProps) => {
     };
   }, [data]);
 
+  const topValue = totals[topMetric as keyof typeof totals] || 0;
   const middleValue = totals[middleMetric as keyof typeof totals] || 0;
   const bottomValue = totals[bottomMetric as keyof typeof totals] || 0;
-
-  const computeWidth = (value: number, previous?: number) => {
-    if (!previous) return '100%';
-    const minWidth = 25;
-    const percent = previous > 0 ? (value / previous) * 100 : 0;
-    const clamped = Math.max(minWidth, Math.min(100, percent));
-    return `${clamped}%`;
-  };
 
   const conversionRate = (current: number, previous: number) => {
     if (previous === 0) return '0.0';
@@ -63,21 +59,18 @@ const FunnelVisualization = ({ data }: FunnelVisualizationProps) => {
     label,
     value,
     color,
-    width,
-    children,
+    widthClass,
   }: {
     label: string;
     value: number;
     color: string;
-    width: string;
-    children?: React.ReactNode;
+    widthClass: string;
   }) => (
-    <div className="flex flex-col items-center -mb-4 last:mb-0" style={{ width }}>
+    <div className="flex flex-col items-center space-y-1 mb-2">
       <div
-        className={`relative h-24 flex flex-col items-center justify-center text-white ${color}`}
+        className={`relative h-24 flex flex-col items-center justify-center text-white ${color} ${widthClass}`}
         style={{ clipPath: 'polygon(0 0, 100% 0, 90% 100%, 10% 100%)' }}
       >
-        {children}
         <span className="text-sm font-medium">{label}</span>
         <span className="text-lg font-bold">{formatNumber(value)}</span>
         <span className="text-xs">{formatCurrency(totals.amountSpent / (value || 1))}</span>
@@ -92,61 +85,80 @@ const FunnelVisualization = ({ data }: FunnelVisualizationProps) => {
           Funil de Conversão
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="space-y-1">
-          <Block
-            label="Impressões"
-            value={totals.impressions}
-            color="bg-blue-600"
-            width={computeWidth(totals.impressions)}
-          />
-          <div className="text-center text-xs text-gray-500 dark:text-gray-400">
-            {conversionRate(middleValue, totals.impressions)}% Conversão
+      <CardContent className="space-y-3 pt-2">
+        <div className="flex justify-between items-center gap-2 pb-2">
+          <div className="flex flex-col items-start text-xs gap-1 text-gray-500 font-normal">
+            <span className="font-medium">Topo</span>
+            <Select value={topMetric} onValueChange={setTopMetric}>
+              <SelectTrigger className="h-8 w-28 text-xs bg-white/70">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {metricOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value} className="text-xs">
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <Block label={metricOptions.find(o => o.value === middleMetric)?.label || middleMetric}
-            value={middleValue}
-            color="bg-green-600"
-            width={computeWidth(middleValue, totals.impressions)}
-          >
-            <div className="absolute top-1 right-1 text-black">
-              <Select value={middleMetric} onValueChange={setMiddleMetric}>
-                <SelectTrigger className="h-6 w-24 text-xs bg-white/70">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {metricOptions.map(option => (
-                    <SelectItem key={option.value} value={option.value} className="text-xs">
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </Block>
-          <div className="text-center text-xs text-gray-500 dark:text-gray-400">
-            {conversionRate(bottomValue, middleValue)}% Conversão
+          <div className="flex flex-col items-start text-xs gap-1 text-gray-500 font-normal">
+            <span className="font-medium">Meio</span>
+            <Select value={middleMetric} onValueChange={setMiddleMetric}>
+              <SelectTrigger className="h-8 w-28 text-xs bg-white/70">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {metricOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value} className="text-xs">
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <Block label={metricOptions.find(o => o.value === bottomMetric)?.label || bottomMetric}
-            value={bottomValue}
-            color="bg-purple-600"
-            width={computeWidth(bottomValue, middleValue)}
-          >
-            <div className="absolute top-1 right-1 text-black">
-              <Select value={bottomMetric} onValueChange={setBottomMetric}>
-                <SelectTrigger className="h-6 w-24 text-xs bg-white/70">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {metricOptions.map(option => (
-                    <SelectItem key={option.value} value={option.value} className="text-xs">
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </Block>
+          <div className="flex flex-col items-start text-xs gap-1 text-gray-500 font-normal">
+            <span className="font-medium">Fundo</span>
+            <Select value={bottomMetric} onValueChange={setBottomMetric}>
+              <SelectTrigger className="h-8 w-28 text-xs bg-white/70">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {metricOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value} className="text-xs">
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
+
+        <Block label={metricOptions.find(o => o.value === topMetric)?.label || topMetric}
+          value={topValue}
+          color="bg-blue-600"
+          widthClass="w-full"
+        />
+
+        <div className="text-center text-xs text-gray-500 dark:text-gray-400">
+          {conversionRate(middleValue, topValue)}% Conversão
+        </div>
+
+        <Block label={metricOptions.find(o => o.value === middleMetric)?.label || middleMetric}
+          value={middleValue}
+          color="bg-green-600"
+          widthClass="w-4/5"
+        />
+
+        <div className="text-center text-xs text-gray-500 dark:text-gray-400">
+          {conversionRate(bottomValue, middleValue)}% Conversão
+        </div>
+
+        <Block label={metricOptions.find(o => o.value === bottomMetric)?.label || bottomMetric}
+          value={bottomValue}
+          color="bg-purple-600"
+          widthClass="w-3/5"
+        />
       </CardContent>
     </Card>
   );
