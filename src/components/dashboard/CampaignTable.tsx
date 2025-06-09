@@ -97,7 +97,7 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Gasto</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">CPM</th>
-                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Conversas</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Conversões</th>
                     <th className="text-center py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">Ações</th>
                   </tr>
                 )}
