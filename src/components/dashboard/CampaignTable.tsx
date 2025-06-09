@@ -1,0 +1,178 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { MoreHorizontal, TrendingUp, TrendingDown } from 'lucide-react';
+import { SheetRow } from '@/hooks/useSheetData';
+
+interface CampaignTableProps {
+  data: SheetRow[];
+}
+
+const CampaignTable = ({ data }: CampaignTableProps) => {
+  const getDevicePlatformBadge = (platform: string) => {
+    const colors: { [key: string]: string } = {
+      'mobile_app': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
+      'mobile_web': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
+      'desktop': 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400',
+      'instagram': 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400',
+      'facebook': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400',
+    };
+
+    const colorClass = colors[platform] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+    return <Badge className={`${colorClass} text-xs px-2 py-0.5 transition-all duration-200 hover:scale-105`}>{platform || 'N/A'}</Badge>;
+  };
+
+  const calculateCTR = (clicks: number, impressions: number) => {
+    return impressions > 0 ? ((clicks / impressions) * 100).toFixed(2) : '0.00';
+  };
+
+  const truncateText = (text: string, maxLength: number = 20) => {
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
+
+  const formatNumber = (num?: number) =>
+    typeof num === 'number' && !isNaN(num)
+      ? new Intl.NumberFormat('pt-BR').format(num)
+      : '0';
+
+  const formatCurrency = (num?: number) =>
+    typeof num === 'number' && !isNaN(num)
+      ? new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+          minimumFractionDigits: 2,
+        }).format(num)
+      : 'R$ 0,00';
+
+  return (
+    <TooltipProvider>
+      <Card className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Dados Detalhados das Campanhas
+            </CardTitle>
+            <Badge variant="outline" className="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-700 transition-all duration-200 hover:scale-105">
+              {data.length} registros
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[200px]">Campanha</th>
+                  <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Data</th>
+                  <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[120px]">Plataforma</th>
+                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
+                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
+                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
+                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Gasto</th>
+                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">CPM</th>
+                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Conversas</th>
+                  <th className="text-center py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.slice(0, 20).map((row, index) => (
+                  <tr key={index} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/10 dark:hover:to-purple-900/10 transition-all duration-200 group/row">
+                    <td className="py-3 px-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="min-w-0 flex-1">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="font-medium text-gray-900 dark:text-gray-100 text-xs cursor-help truncate">
+                                {truncateText(row.campaignName || 'N/A', 25)}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent className="bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 p-2 rounded-lg shadow-lg">
+                              <p className="font-medium">{row.campaignName || 'N/A'}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 cursor-help truncate">
+                                {truncateText(row.adSetName || 'N/A', 25)}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent className="bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 p-2 rounded-lg shadow-lg">
+                              <p>{row.adSetName || 'N/A'}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                        {row.clicks > 100 ? (
+                          <TrendingUp className="w-3 h-3 text-green-500 transition-transform duration-200 group-hover/row:scale-110" />
+                        ) : (
+                          <TrendingDown className="w-3 h-3 text-red-500 transition-transform duration-200 group-hover/row:scale-110" />
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3 px-2">
+                      <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
+                        {row.day || 'N/A'}
+                      </div>
+                    </td>
+                    <td className="py-3 px-2">
+                      {getDevicePlatformBadge(row.devicePlatform)}
+                    </td>
+                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                      {formatNumber(row.impressions)}
+                    </td>
+                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                      {formatNumber(row.clicks)}
+                    </td>
+                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                      {calculateCTR(row.clicks, row.impressions)}%
+                    </td>
+                    <td className="py-3 px-2 text-right">
+                      <div className="font-medium text-gray-900 dark:text-gray-100 text-xs">
+                        {formatCurrency(row.amountSpent)}
+                      </div>
+                    </td>
+                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                      {typeof row.cpm === 'number' && !isNaN(row.cpm) ? `R$ ${row.cpm.toFixed(2)}` : 'R$ 0,00'}
+                    </td>
+                    <td className="py-3 px-2 text-right">
+                      <div className="font-medium text-gray-900 dark:text-gray-100 text-xs">{formatNumber(row.messagingConversations)}</div>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 cursor-help truncate">
+                            {truncateText(row.conversionDevice || 'N/A', 12)}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 p-2 rounded-lg shadow-lg">
+                          <p>{row.conversionDevice || 'N/A'}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </td>
+                    <td className="py-3 px-2 text-center">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="hover:bg-blue-50 dark:hover:bg-blue-900/20 h-6 w-6 p-0 transition-all duration-200 hover:scale-110"
+                      >
+                        <MoreHorizontal className="w-3 h-3" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {data.length > 20 && (
+              <div className="mt-4 text-center">
+                <Badge variant="outline" className="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 transition-all duration-200 hover:scale-105">
+                  Mostrando 20 de {data.length} registros
+                </Badge>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </TooltipProvider>
+  );
+};
+
+export default CampaignTable;
