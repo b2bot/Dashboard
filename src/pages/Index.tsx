@@ -5,6 +5,7 @@ import SectionTabs from '@/components/navigation/SectionTabs';
 {/*import AdvancedFilters from '@/components/filters/AdvancedFilters';*/}
 import MetricsGrid from '@/components/dashboard/MetricsGrid';
 import CampaignCharts from '@/components/dashboard/CampaignCharts';
+import FunnelVisualization from '@/components/dashboard/FunnelVisualization';
 import CampaignTable from '@/components/dashboard/CampaignTable';
 import CampaignLevel from '@/components/dashboard/CampaignLevel';
 import AdSetLevel from '@/components/dashboard/AdSetLevel';
@@ -282,13 +283,7 @@ const Index = () => {
               <CampaignCharts data={filteredData} />
             </div>
             <div className="lg:col-span-1">
-              <Card className="border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm h-full">
-                <CardContent className="p-4 flex items-center justify-center">
-                  <div className="text-center text-gray-500 dark:text-gray-400">
-                    <p className="text-sm">Espaço para gráficos adicionais</p>
-                  </div>
-                </CardContent>
-              </Card>
+              <FunnelVisualization data={filteredData} />
             </div>
           </div>
           
