@@ -151,7 +151,7 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 transition-colors duration-300">
         <PlatformNavigation />
-        <SectionTabs accounts={[]} />
+        <SectionTabs accounts={[]} data={[]} />
         <main className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
 		{/*
           <div className="py-3">
@@ -182,7 +182,7 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-red-50 to-orange-50 dark:from-gray-900 dark:via-red-900 dark:to-orange-900 transition-colors duration-300">
         <PlatformNavigation />
-        <SectionTabs accounts={[]} />
+        <SectionTabs accounts={[]} data={[]} />
         <main className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-6">
           {/*<AdvancedFilters data={[]} platformName={platformConfig?.name} />*/}
           <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-red-200 dark:border-red-700 mt-4">
@@ -224,18 +224,18 @@ const Index = () => {
         );
       }
     } else if (section === 'grupos') {
-      return <CampaignTable data={aggregatedData} />;
+      return <CampaignTable data={aggregatedData} section="grupos" />;
     } else if (section === 'anuncios') {
-      return <CampaignTable data={aggregatedData} />;
+      return <CampaignTable data={aggregatedData} section="anuncios" />;
     }
 
-    return <CampaignTable data={filteredData} />;
+    return <CampaignTable data={filteredData} section="campanhas" />;
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 transition-colors duration-300">
       <PlatformNavigation />
-      <SectionTabs accounts={uniqueAccounts} />
+      <SectionTabs accounts={uniqueAccounts} data={filteredData} />
       
       <main className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Filters and Platform header */}

@@ -16,14 +16,14 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
       existingDay.impressions += row.impressions;
       existingDay.clicks += row.clicks;
       existingDay.spent += row.amountSpent;
-      existingDay.conversations += row.messagingConversations;
+      existingDay.conversations += row.actionMessagingConversationsStarted;
     } else {
       acc.push({
         day: row.day,
         impressions: row.impressions,
         clicks: row.clicks,
         spent: row.amountSpent,
-        conversations: row.messagingConversations,
+        conversations: row.actionMessagingConversationsStarted,
       });
     }
     return acc;
@@ -32,7 +32,7 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
 
   // Agregar dados por plataforma
   const platformData = data.reduce((acc, row) => {
-    const platform = row.devicePlatform || 'Não especificado';
+    const platform = row.accountName || 'Não especificado';
     const existing = acc.find(p => p.name === platform);
     if (existing) {
       existing.value += row.amountSpent;

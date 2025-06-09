@@ -12,7 +12,10 @@ const MetricsOverview = ({ data }: MetricsOverviewProps) => {
   const totalImpressions = data.reduce((sum, row) => sum + row.impressions, 0);
   const totalClicks = data.reduce((sum, row) => sum + row.clicks, 0);
   const totalSpent = data.reduce((sum, row) => sum + row.amountSpent, 0);
-  const totalConversations = data.reduce((sum, row) => sum + row.messagingConversations, 0);
+  const totalConversations = data.reduce(
+    (sum, row) => sum + (row.actionMessagingConversationsStarted || 0),
+    0
+  );
   
   const ctr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
 
