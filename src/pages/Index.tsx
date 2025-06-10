@@ -24,7 +24,7 @@ import ItemLevelFilter from '@/components/filters/ItemLevelFilter';
 
 const Index = () => {
   const { currentSheetId } = useClientManager();
-  const { currentSheetRange, platformConfig, section } = usePlatformNavigation();
+  const { currentSheetRange, platformConfig, section, platform } = usePlatformNavigation();
   const { filters } = useFilters();
   const { data, isLoading, error } = useSheetData(currentSheetId, currentSheetRange);
   const [selectedItem, setSelectedItem] = React.useState<string>('all');
