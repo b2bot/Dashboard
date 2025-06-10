@@ -24,6 +24,33 @@ export interface SheetRow {
   reach: number;
   frequency: number;
   messagingConversations: number;
+
+  // Google Ads specific fields
+  conversions?: number;
+  callAdConversionAction?: number;
+  costPerConversion?: number;
+  adStatus?: string;
+  adGroupStatus?: string;
+  campaignStatus?: string;
+  conversionsFromInteractionsRate?: number;
+
+  // LinkedIn specific fields
+  reactions?: number;
+  campaignGroupName?: string;
+  campaignFormat?: string;
+  campaignLocaleCountry?: string;
+  campaignTotalBudgetAmount?: number;
+  landingPageClicks?: number;
+  textUrlClicks?: number;
+  jobApplications?: number;
+
+  // Relatórios specific fields
+  contatos?: number;
+  agendado?: number;
+  atendimento?: number;
+  orcamentos?: number;
+  vendas?: number;
+  faturado?: number;
   devicePlatform: string;
   conversionDevice: string;
   adCreativeName: string;
@@ -106,6 +133,70 @@ export const useSheetData = (sheetId: string, range: string = 'Meta!A1:Z') => {
               break;
             case 'action link clicks':
               mappedRow.actionLinkClicks = parseNumber(value);
+              break;
+            case 'conversions':
+              mappedRow.conversions = parseNumber(value);
+              break;
+            case 'call ad conversion action':
+              mappedRow.callAdConversionAction = parseNumber(value);
+              break;
+            case 'cost per conversion':
+              mappedRow.costPerConversion = parseNumber(value);
+              break;
+            case 'ad status':
+              mappedRow.adStatus = value;
+              break;
+            case 'ad group status':
+              mappedRow.adGroupStatus = value;
+              break;
+            case 'campaign status':
+              mappedRow.campaignStatus = value;
+              break;
+            case 'conversions from interactions rate':
+              mappedRow.conversionsFromInteractionsRate = parseNumber(value);
+              break;
+            case 'ad analytics reactions':
+              mappedRow.reactions = parseNumber(value);
+              break;
+            case 'campaign group name':
+              mappedRow.campaignGroupName = value;
+              break;
+            case 'campaign format':
+              mappedRow.campaignFormat = value;
+              break;
+            case 'campaign locale country':
+              mappedRow.campaignLocaleCountry = value;
+              break;
+            case 'campaign total budget amount':
+              mappedRow.campaignTotalBudgetAmount = parseNumber(value);
+              break;
+            case 'ad analytics landing page clicks':
+              mappedRow.landingPageClicks = parseNumber(value);
+              break;
+            case 'ad analytics text url clicks':
+              mappedRow.textUrlClicks = parseNumber(value);
+              break;
+            case 'ad analytics job applications':
+              mappedRow.jobApplications = parseNumber(value);
+              break;
+            case 'contatos':
+              mappedRow.contatos = parseNumber(value);
+              break;
+            case 'agendado':
+              mappedRow.agendado = parseNumber(value);
+              break;
+            case 'atendimento':
+              mappedRow.atendimento = parseNumber(value);
+              break;
+            case 'or\u00e7amentos':
+            case 'orcamentos':
+              mappedRow.orcamentos = parseNumber(value);
+              break;
+            case 'vendas':
+              mappedRow.vendas = parseNumber(value);
+              break;
+            case 'faturado':
+              mappedRow.faturado = parseNumber(value);
               break;
             case 'messaging conversations':
               mappedRow.messagingConversations = parseNumber(value);
