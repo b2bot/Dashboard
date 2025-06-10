@@ -8,7 +8,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { SheetRow } from '@/hooks/useSheetData';
 import { format, parseISO } from 'date-fns';
 
-import { TabSection } from '@/hooks/usePlatformNavigation';
+import { TabSection, usePlatformNavigation } from '@/hooks/usePlatformNavigation';
 
 interface CampaignTableProps {
   data: SheetRow[];
@@ -18,6 +18,7 @@ interface CampaignTableProps {
 
 const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
   const [previewImage, setPreviewImage] = React.useState<string | null>(null);
+  const { platform } = usePlatformNavigation();
 
 
   const calculateCTR = (clicks: number, impressions: number) => {
@@ -50,15 +51,24 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
         }).format(num)
       : '0,00';
 
-  const headerTitle =
-    section === 'grupos'
+  const isGoogle = platform === 'google';
+  const isRelatorios = platform === 'relatorios';
+
+  const headerTitle = isRelatorios
+    ? 'Dados enviados diariamente'
+    : section === 'grupos'
       ? 'Dados Detalhados dos Grupos de Anúncio'
       : section === 'anuncios'
         ? 'Dados Detalhados dos Anúncios'
         : 'Dados Detalhados das Campanhas';
 
-  const firstColHeader =
-    section === 'grupos' ? 'Grupo de Anúncio' : section === 'anuncios' ? 'Anúncio' : 'Campanha';
+  const firstColHeader = isRelatorios
+    ? 'Data de Envio'
+    : section === 'grupos'
+      ? 'Grupo de Anúncio'
+      : section === 'anuncios'
+        ? 'Anúncio'
+        : 'Campanha';
 
   return (
     <TooltipProvider>
