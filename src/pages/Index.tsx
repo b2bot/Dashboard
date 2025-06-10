@@ -24,7 +24,7 @@ import ItemLevelFilter from '@/components/filters/ItemLevelFilter';
 
 const Index = () => {
   const { currentSheetId } = useClientManager();
-  const { currentSheetRange, platformConfig, section } = usePlatformNavigation();
+  const { currentSheetRange, platformConfig, section, platform } = usePlatformNavigation();
   const { filters } = useFilters();
   const { data, isLoading, error } = useSheetData(currentSheetId, currentSheetRange);
   const [selectedItem, setSelectedItem] = React.useState<string>('all');
@@ -310,10 +310,10 @@ const Index = () => {
           {/* Charts com altura reduzida */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="lg:col-span-2">
-              <CampaignCharts data={metricsData} />
+                <CampaignCharts data={metricsData} platform={platform} />
             </div>
             <div className="lg:col-span-1">
-              <FunnelVisualization data={metricsData} />
+                <FunnelVisualization data={metricsData} platform={platform} />
             </div>
           </div>
           

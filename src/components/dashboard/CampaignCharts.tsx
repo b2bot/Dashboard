@@ -14,36 +14,40 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { SheetRow } from '@/hooks/useSheetData';
+import { usePlatformNavigation } from '@/hooks/usePlatformNavigation';
 
 interface CampaignChartsProps {
   data: SheetRow[];
 }
 
 const CampaignCharts = ({ data }: CampaignChartsProps) => {
+  const { platform } = usePlatformNavigation();
   // Agregar dados por dia
   const rawDailyData = data.reduce((acc, row) => {
     const existingDay = acc.find(d => d.day === row.day);
+    const conv = row.actionMessagingConversationsStarted || row.conversions || row.vendas || 0;
+    const agend = row.agendado || 0;
+    const contatos = row.contatos || 0;
     if (existingDay) {
-      existingDay.impressions += row.impressions;
-      existingDay.clicks += row.clicks;
-      existingDay.spent += row.amountSpent;
-
-      existingDay.conversations +=
-        row.actionMessagingConversationsStarted || 0;
-
+      existingDay.impressions += row.impressions || 0;
+      existingDay.clicks += row.clicks || 0;
+      existingDay.spent += row.amountSpent || 0;
+      existingDay.conversions += conv;
+      existingDay.agendado += agend;
+      existingDay.contatos += contatos;
     } else {
       acc.push({
         day: row.day,
-        impressions: row.impressions,
-        clicks: row.clicks,
-        spent: row.amountSpent,
-
-        conversations: row.actionMessagingConversationsStarted || 0,
-
+        impressions: row.impressions || 0,
+        clicks: row.clicks || 0,
+        spent: row.amountSpent || 0,
+        conversions: conv,
+        agendado: agend,
+        contatos,
       });
     }
     return acc;
-  }, [] as Array<{day: string, impressions: number, clicks: number, spent: number, conversations: number}>)
+  }, [] as Array<{day: string; impressions: number; clicks: number; spent: number; conversions: number; agendado: number; contatos: number}>)
   .sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime());
 
   const dailyData = rawDailyData.map(d => ({
@@ -88,6 +92,26 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
         <CardContent>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
+              {platform === 'google' ? (
+                <LineChart data={dailyData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" className="dark:stroke-gray-600" />
+                  <XAxis dataKey="day" stroke="#6B7280" fontSize={11} />
+                  <YAxis stroke="#6B7280" fontSize={11} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px' }} />
+                  <Line type="monotone" dataKey="impressions" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 3 }} name="Impressões" />
+                  <Line type="monotone" dataKey="clicks" stroke="#F59E0B" strokeWidth={2} dot={{ fill: '#F59E0B', r: 3 }} name="Cliques" />
+                  <Line type="monotone" dataKey="conversions" stroke="#10B981" strokeWidth={2} dot={{ fill: '#10B981', r: 3 }} name="Conversões" />
+                </LineChart>
+              ) : platform === 'relatorios' ? (
+                <LineChart data={dailyData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" className="dark:stroke-gray-600" />
+                  <XAxis dataKey="day" stroke="#6B7280" fontSize={11} />
+                  <YAxis stroke="#6B7280" fontSize={11} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px' }} />
+                  <Line type="monotone" dataKey="contatos" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 3 }} name="Contatos" />
+                  <Line type="monotone" dataKey="agendado" stroke="#F59E0B" strokeWidth={2} dot={{ fill: '#F59E0B', r: 3 }} name="Agendado" />
+                </LineChart>
+              ) : (
               <AreaChart data={dailyData}>
                 <defs>
                   <linearGradient id="colorSpent" x1="0" y1="0" x2="0" y2="1">
@@ -132,6 +156,7 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
                   name="Conversas"
                 />
               </AreaChart>
+              )}
             </ResponsiveContainer>
           </div>
         </CardContent>
@@ -151,30 +176,25 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" className="dark:stroke-gray-600" />
                 <XAxis dataKey="day" stroke="#6B7280" fontSize={11} />
                 <YAxis stroke="#6B7280" fontSize={11} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'var(--background)', 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'var(--background)',
                     border: '1px solid var(--border)',
                     borderRadius: '8px',
                     fontSize: '12px'
                   }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="impressions" 
-                  stroke="#8B5CF6" 
-                  strokeWidth={2}
-                  dot={{ fill: '#8B5CF6', strokeWidth: 2, r: 3 }}
-                  name="Impressões"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="clicks" 
-                  stroke="#F59E0B" 
-                  strokeWidth={2}
-                  dot={{ fill: '#F59E0B', strokeWidth: 2, r: 3 }}
-                  name="Cliques"
-                />
+                {platform === 'relatorios' ? (
+                  <>
+                    <Line type="monotone" dataKey="atendimento" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 3 }} name="Atendimento" />
+                    <Line type="monotone" dataKey="vendas" stroke="#F59E0B" strokeWidth={2} dot={{ fill: '#F59E0B', r: 3 }} name="Vendas" />
+                  </>
+                ) : (
+                  <>
+                    <Line type="monotone" dataKey="impressions" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 3 }} name="Impressões" />
+                    <Line type="monotone" dataKey="clicks" stroke="#F59E0B" strokeWidth={2} dot={{ fill: '#F59E0B', r: 3 }} name="Cliques" />
+                  </>
+                )}
               </LineChart>
             </ResponsiveContainer>
           </div>

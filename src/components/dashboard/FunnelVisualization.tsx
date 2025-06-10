@@ -3,12 +3,13 @@ import React, { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SheetRow } from '@/hooks/useSheetData';
+import { usePlatformNavigation } from '@/hooks/usePlatformNavigation';
 
 interface FunnelVisualizationProps {
   data: SheetRow[];
 }
 
-const metricOptions = [
+const defaultMetricOptions = [
   { value: 'impressions', label: 'Impressões' },
   { value: 'clicks', label: 'Cliques' },
   { value: 'actionLinkClicks', label: 'Link Clicks' },
@@ -24,9 +25,28 @@ const formatCurrency = (num: number) =>
     : 'R$ 0,00';
 
 const FunnelVisualization = ({ data }: FunnelVisualizationProps) => {
-  const [topMetric, setTopMetric] = useState('impressions');
-  const [middleMetric, setMiddleMetric] = useState('clicks');
-  const [bottomMetric, setBottomMetric] = useState('actionMessagingConversationsStarted');
+  const { platform } = usePlatformNavigation();
+  const metricOptions = React.useMemo(() => {
+    if (platform === 'google') {
+      return [
+        { value: 'impressions', label: 'Impressões' },
+        { value: 'clicks', label: 'Cliques' },
+        { value: 'conversions', label: 'Conversões' },
+      ];
+    }
+    if (platform === 'relatorios') {
+      return [
+        { value: 'contatos', label: 'Contatos' },
+        { value: 'agendado', label: 'Agendado' },
+        { value: 'vendas', label: 'Vendas' },
+      ];
+    }
+    return defaultMetricOptions;
+  }, [platform]);
+
+  const [topMetric, setTopMetric] = useState(metricOptions[0].value);
+  const [middleMetric, setMiddleMetric] = useState(metricOptions[1].value);
+  const [bottomMetric, setBottomMetric] = useState(metricOptions[2].value);
 
   const totals = useMemo(() => {
     const sum = (field: keyof SheetRow) =>
@@ -38,6 +58,10 @@ const FunnelVisualization = ({ data }: FunnelVisualizationProps) => {
       actionLinkClicks: sum('actionLinkClicks'),
       actionMessagingConversationsStarted: sum('actionMessagingConversationsStarted'),
       messagingConversations: sum('messagingConversations'),
+      conversions: sum('conversions'),
+      contatos: sum('contatos'),
+      agendado: sum('agendado'),
+      vendas: sum('vendas'),
       amountSpent: sum('amountSpent'),
     };
   }, [data]);

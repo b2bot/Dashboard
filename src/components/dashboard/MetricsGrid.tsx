@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Eye, MousePointer, DollarSign, Users, Target, Zap, Repeat } from 'lucide-react';
 import { SheetRow } from '@/hooks/useSheetData';
-import { TabSection } from '@/hooks/usePlatformNavigation';
+import { TabSection, usePlatformNavigation } from '@/hooks/usePlatformNavigation';
 
 interface MetricsGridProps {
   data: SheetRow[];
@@ -12,17 +12,49 @@ interface MetricsGridProps {
 }
 
 const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
+  const { platform } = usePlatformNavigation();
   const totalImpressions = data.reduce((sum, row) => sum + (row.impressions || 0), 0);
   const totalClicks = data.reduce((sum, row) => sum + (row.clicks || 0), 0);
   const totalInvestment = data.reduce((sum, row) => sum + (row.amountSpent || 0), 0);
-  const totalConversions = data.reduce((sum, row) => sum + (row.actionMessagingConversationsStarted || 0), 0);
-  const totalCostPerConversion = data.length > 0 ?
-    data.reduce((sum, row) => sum + (row.costPerActionMessagingConversations || 0), 0) / data.length : 0;
-  const totalActionLinkClicks = data.reduce((sum, row) => sum + (row.actionLinkClicks || 0), 0);
+  const totalConversions = data.reduce(
+    (sum, row) =>
+      sum +
+      (row.actionMessagingConversationsStarted ||
+        row.conversions ||
+        0),
+    0
+  );
+  const totalCostPerConversion =
+    data.length > 0
+      ? data.reduce(
+          (sum, row) =>
+            sum +
+            (row.costPerActionMessagingConversations || row.costPerConversion || 0),
+          0
+        ) / data.length
+      : 0;
+  const totalActionLinkClicks = data.reduce(
+    (sum, row) => sum + (row.actionLinkClicks || row.landingPageClicks || 0),
+    0
+  );
   const totalFrequency = data.reduce((sum, row) => sum + (row.frequency || 0), 0);
+  const totalCallAdConversion = data.reduce(
+    (sum, row) => sum + (row.callAdConversionAction || 0),
+    0
+  );
+  const totalContatos = data.reduce((sum, row) => sum + (row.contatos || 0), 0);
+  const totalAgendado = data.reduce((sum, row) => sum + (row.agendado || 0), 0);
+  const totalAtendimento = data.reduce((sum, row) => sum + (row.atendimento || 0), 0);
+  const totalOrcamentos = data.reduce((sum, row) => sum + (row.orcamentos || 0), 0);
+  const totalVendas = data.reduce((sum, row) => sum + (row.vendas || 0), 0);
+  const totalFaturado = data.reduce((sum, row) => sum + (row.faturado || 0), 0);
   
-  // Taxa de conversão: Conversões ÷ Action Link Clicks
-  const conversionRate = totalActionLinkClicks > 0 ? (totalConversions / totalActionLinkClicks) * 100 : 0;
+  let conversionRate = 0;
+  if (platform === 'relatorios') {
+    conversionRate = totalAtendimento > 0 ? (totalVendas / totalAtendimento) * 100 : 0;
+  } else {
+    conversionRate = totalActionLinkClicks > 0 ? (totalConversions / totalActionLinkClicks) * 100 : 0;
+  }
 
   const formatNumber = (num: number) => num ? new Intl.NumberFormat('pt-BR').format(num) : '0';
   const formatCurrency = (num: number) => num ? new Intl.NumberFormat('pt-BR', {
@@ -33,121 +65,152 @@ const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
   const formatFrequency = (num: number) =>
     num ? new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num) : '0,00';
 
-  const campaignMetrics = [
-    {
-      title: 'Impressões',
-      value: formatNumber(totalImpressions),
-      icon: Eye,
-      color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
-      trend: '+12.5%',
-      trendUp: true,
-    },
-    {
-      title: 'Cliques',
-      value: formatNumber(totalClicks),
-      icon: MousePointer,
-      color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-50 dark:bg-green-900/20',
-      trend: '+8.2%',
-      trendUp: true,
-    },
-    {
-      title: 'Investimento',
-      value: formatCurrency(totalInvestment),
-      icon: DollarSign,
-      color: 'text-red-600 dark:text-red-400',
-      bgColor: 'bg-red-50 dark:bg-red-900/20',
-      trend: '+3.1%',
-      trendUp: true,
-    },
-    {
-      title: 'Conversões',
-      value: formatNumber(totalConversions),
-      icon: Target,
-      color: 'text-purple-600 dark:text-purple-400',
-      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
-      trend: '+15.7%',
-      trendUp: true,
-    },
-    {
-      title: 'Taxa de Conversão',
-      value: formatPercentage(conversionRate),
-      icon: Users,
-      color: 'text-indigo-600 dark:text-indigo-400',
-      bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
-      trend: '+0.8%',
-      trendUp: true,
-    },
-    {
-      title: 'Custo/Conversão',
-      value: formatCurrency(totalCostPerConversion),
-      icon: Zap,
-      color: 'text-orange-600 dark:text-orange-400',
-      bgColor: 'bg-orange-50 dark:bg-orange-900/20',
-      trend: '-2.1%',
-      trendUp: false,
-    },
-  ];
+  let metrics;
 
-  const groupMetrics = [
-    {
-      title: 'Impressões',
-      value: formatNumber(totalImpressions),
-      icon: Eye,
-      color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
-      trend: '+12.5%',
-      trendUp: true,
-    },
-    {
-      title: 'Cliques',
-      value: formatNumber(totalClicks),
-      icon: MousePointer,
-      color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-50 dark:bg-green-900/20',
-      trend: '+8.2%',
-      trendUp: true,
-    },
-    {
-      title: 'Frequência',
-      value: formatFrequency(totalFrequency / (data.length || 1)),
-      icon: Repeat,
-      color: 'text-red-600 dark:text-red-400',
-      bgColor: 'bg-red-50 dark:bg-red-900/20',
-      trend: '+3.1%',
-      trendUp: true,
-    },
-    {
-      title: 'Conversões',
-      value: formatNumber(totalConversions),
-      icon: Target,
-      color: 'text-purple-600 dark:text-purple-400',
-      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
-      trend: '+15.7%',
-      trendUp: true,
-    },
-    {
-      title: 'Taxa de Conversão',
-      value: formatPercentage(conversionRate),
-      icon: Users,
-      color: 'text-indigo-600 dark:text-indigo-400',
-      bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
-      trend: '+0.8%',
-      trendUp: true,
-    },
-    {
-      title: 'Custo/Conversão',
-      value: formatCurrency(totalCostPerConversion),
-      icon: Zap,
-      color: 'text-orange-600 dark:text-orange-400',
-      bgColor: 'bg-orange-50 dark:bg-orange-900/20',
-      trend: '-2.1%',
-      trendUp: false,
-    },
-  ];
+  if (platform === 'google') {
+    metrics = [
+      { title: 'Impressões', value: formatNumber(totalImpressions), icon: Eye, color: 'text-blue-600', bgColor: 'bg-blue-50', trend: '', trendUp: true },
+      { title: 'Cliques', value: formatNumber(totalClicks), icon: MousePointer, color: 'text-green-600', bgColor: 'bg-green-50', trend: '', trendUp: true },
+      { title: 'Custo', value: formatCurrency(totalInvestment), icon: DollarSign, color: 'text-red-600', bgColor: 'bg-red-50', trend: '', trendUp: true },
+      { title: 'Conversões', value: formatNumber(totalConversions), icon: Target, color: 'text-purple-600', bgColor: 'bg-purple-50', trend: '', trendUp: true },
+      { title: 'Custo/Conversão', value: formatCurrency(totalCostPerConversion), icon: Zap, color: 'text-orange-600', bgColor: 'bg-orange-50', trend: '', trendUp: true },
+      { title: 'Call Ad', value: formatNumber(totalCallAdConversion), icon: Users, color: 'text-indigo-600', bgColor: 'bg-indigo-50', trend: '', trendUp: true },
+    ];
+  } else if (platform === 'linkedin') {
+    metrics = [
+      { title: 'Impressões', value: formatNumber(totalImpressions), icon: Eye, color: 'text-blue-600', bgColor: 'bg-blue-50', trend: '', trendUp: true },
+      { title: 'Cliques', value: formatNumber(totalClicks), icon: MousePointer, color: 'text-green-600', bgColor: 'bg-green-50', trend: '', trendUp: true },
+      { title: 'Custo', value: formatCurrency(totalInvestment), icon: DollarSign, color: 'text-red-600', bgColor: 'bg-red-50', trend: '', trendUp: true },
+      { title: 'CTR', value: formatPercentage(data.length > 0 ? (totalClicks / totalImpressions) * 100 : 0), icon: Users, color: 'text-indigo-600', bgColor: 'bg-indigo-50', trend: '', trendUp: true },
+      { title: 'CPC', value: formatCurrency(totalClicks > 0 ? totalInvestment / totalClicks : 0), icon: Zap, color: 'text-orange-600', bgColor: 'bg-orange-50', trend: '', trendUp: true },
+      { title: 'CPM', value: formatCurrency(totalImpressions > 0 ? (totalInvestment / totalImpressions) * 1000 : 0), icon: Repeat, color: 'text-purple-600', bgColor: 'bg-purple-50', trend: '', trendUp: true },
+    ];
+  } else if (platform === 'relatorios') {
+    metrics = [
+      { title: 'Contatos', value: formatNumber(totalContatos), icon: Eye, color: 'text-blue-600', bgColor: 'bg-blue-50', trend: '', trendUp: true },
+      { title: 'Agendado', value: formatNumber(totalAgendado), icon: MousePointer, color: 'text-green-600', bgColor: 'bg-green-50', trend: '', trendUp: true },
+      { title: 'Atendimento', value: formatNumber(totalAtendimento), icon: DollarSign, color: 'text-red-600', bgColor: 'bg-red-50', trend: '', trendUp: true },
+      { title: 'Orçamentos', value: formatNumber(totalOrcamentos), icon: Target, color: 'text-purple-600', bgColor: 'bg-purple-50', trend: '', trendUp: true },
+      { title: 'Vendas', value: formatNumber(totalVendas), icon: Zap, color: 'text-orange-600', bgColor: 'bg-orange-50', trend: '', trendUp: true },
+      { title: 'Faturado', value: formatCurrency(totalFaturado), icon: Users, color: 'text-indigo-600', bgColor: 'bg-indigo-50', trend: '', trendUp: true },
+    ];
+  } else {
+    const campaignMetrics = [
+      {
+        title: 'Impressões',
+        value: formatNumber(totalImpressions),
+        icon: Eye,
+        color: 'text-blue-600 dark:text-blue-400',
+        bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+        trend: '+12.5%',
+        trendUp: true,
+      },
+      {
+        title: 'Cliques',
+        value: formatNumber(totalClicks),
+        icon: MousePointer,
+        color: 'text-green-600 dark:text-green-400',
+        bgColor: 'bg-green-50 dark:bg-green-900/20',
+        trend: '+8.2%',
+        trendUp: true,
+      },
+      {
+        title: 'Investimento',
+        value: formatCurrency(totalInvestment),
+        icon: DollarSign,
+        color: 'text-red-600 dark:text-red-400',
+        bgColor: 'bg-red-50 dark:bg-red-900/20',
+        trend: '+3.1%',
+        trendUp: true,
+      },
+      {
+        title: 'Conversões',
+        value: formatNumber(totalConversions),
+        icon: Target,
+        color: 'text-purple-600 dark:text-purple-400',
+        bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+        trend: '+15.7%',
+        trendUp: true,
+      },
+      {
+        title: 'Taxa de Conversão',
+        value: formatPercentage(conversionRate),
+        icon: Users,
+        color: 'text-indigo-600 dark:text-indigo-400',
+        bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
+        trend: '+0.8%',
+        trendUp: true,
+      },
+      {
+        title: 'Custo/Conversão',
+        value: formatCurrency(totalCostPerConversion),
+        icon: Zap,
+        color: 'text-orange-600 dark:text-orange-400',
+        bgColor: 'bg-orange-50 dark:bg-orange-900/20',
+        trend: '-2.1%',
+        trendUp: false,
+      },
+    ];
 
-  const metrics = section === 'campanhas' ? campaignMetrics : groupMetrics;
+    const groupMetrics = [
+      {
+        title: 'Impressões',
+        value: formatNumber(totalImpressions),
+        icon: Eye,
+        color: 'text-blue-600 dark:text-blue-400',
+        bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+        trend: '+12.5%',
+        trendUp: true,
+      },
+      {
+        title: 'Cliques',
+        value: formatNumber(totalClicks),
+        icon: MousePointer,
+        color: 'text-green-600 dark:text-green-400',
+        bgColor: 'bg-green-50 dark:bg-green-900/20',
+        trend: '+8.2%',
+        trendUp: true,
+      },
+      {
+        title: 'Frequência',
+        value: formatFrequency(totalFrequency / (data.length || 1)),
+        icon: Repeat,
+        color: 'text-red-600 dark:text-red-400',
+        bgColor: 'bg-red-50 dark:bg-red-900/20',
+        trend: '+3.1%',
+        trendUp: true,
+      },
+      {
+        title: 'Conversões',
+        value: formatNumber(totalConversions),
+        icon: Target,
+        color: 'text-purple-600 dark:text-purple-400',
+        bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+        trend: '+15.7%',
+        trendUp: true,
+      },
+      {
+        title: 'Taxa de Conversão',
+        value: formatPercentage(conversionRate),
+        icon: Users,
+        color: 'text-indigo-600 dark:text-indigo-400',
+        bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
+        trend: '+0.8%',
+        trendUp: true,
+      },
+      {
+        title: 'Custo/Conversão',
+        value: formatCurrency(totalCostPerConversion),
+        icon: Zap,
+        color: 'text-orange-600 dark:text-orange-400',
+        bgColor: 'bg-orange-50 dark:bg-orange-900/20',
+        trend: '-2.1%',
+        trendUp: false,
+      },
+    ];
+
+    metrics = section === 'campanhas' ? campaignMetrics : groupMetrics;
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-6">
