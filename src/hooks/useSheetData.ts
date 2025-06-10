@@ -221,6 +221,7 @@ export const useSheetData = (sheetId: string, range: string = 'Meta!A1:Z') => {
               break;
             case 'day':
             case 'date':
+            case 'date (segment)':
               mappedRow.day = value;
               break;
             default:
