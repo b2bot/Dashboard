@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { format, parseISO } from 'date-fns';
 import {
   LineChart,
   Line,
@@ -20,7 +21,7 @@ interface CampaignChartsProps {
 
 const CampaignCharts = ({ data }: CampaignChartsProps) => {
   // Agregar dados por dia
-  const dailyData = data.reduce((acc, row) => {
+  const rawDailyData = data.reduce((acc, row) => {
     const existingDay = acc.find(d => d.day === row.day);
     if (existingDay) {
       existingDay.impressions += row.impressions;
@@ -44,6 +45,11 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
     return acc;
   }, [] as Array<{day: string, impressions: number, clicks: number, spent: number, conversations: number}>)
   .sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime());
+
+  const dailyData = rawDailyData.map(d => ({
+    ...d,
+    day: format(parseISO(d.day), 'dd.MM.yyyy'),
+  }));
 
 
 

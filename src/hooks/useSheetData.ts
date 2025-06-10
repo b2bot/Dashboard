@@ -1,6 +1,12 @@
 
 import { useQuery } from '@tanstack/react-query';
 
+const parseNumber = (value: string): number => {
+  if (!value) return 0;
+  const normalized = value.replace(/\./g, '').replace(',', '.');
+  return parseFloat(normalized) || 0;
+};
+
 export interface SheetRow {
   accountName: string;
   campaignName: string;
@@ -70,39 +76,39 @@ export const useSheetData = (sheetId: string, range: string = 'Meta!A1:Z') => {
               mappedRow.adName = value;
               break;
             case 'impressions':
-              mappedRow.impressions = parseFloat(value) || 0;
+              mappedRow.impressions = parseNumber(value);
               break;
             case 'clicks':
-              mappedRow.clicks = parseFloat(value) || 0;
+              mappedRow.clicks = parseNumber(value);
               break;
             case 'spend (cost, amount spent)':
             case 'amount spent':
-              mappedRow.amountSpent = parseFloat(value) || 0;
+              mappedRow.amountSpent = parseNumber(value);
               break;
             case 'cpm (cost per 1000 impressions)':
             case 'cpm':
-              mappedRow.cpm = parseFloat(value) || 0;
+              mappedRow.cpm = parseNumber(value);
               break;
             case 'cpc (cost per click)':
             case 'cpc':
-              mappedRow.cpc = parseFloat(value) || 0;
+              mappedRow.cpc = parseNumber(value);
               break;
             case 'ctr (clickthrough rate)':
             case 'ctr':
-              mappedRow.ctr = parseFloat(value) || 0;
+              mappedRow.ctr = parseNumber(value);
               break;
             case 'action messaging conversations started (onsite conversion)':
-              mappedRow.actionMessagingConversationsStarted = parseFloat(value) || 0;
-              mappedRow.messagingConversations = parseFloat(value) || 0;
+              mappedRow.actionMessagingConversationsStarted = parseNumber(value);
+              mappedRow.messagingConversations = parseNumber(value);
               break;
             case 'cost per action messaging conversations started (onsite conversion)':
-              mappedRow.costPerActionMessagingConversations = parseFloat(value) || 0;
+              mappedRow.costPerActionMessagingConversations = parseNumber(value);
               break;
             case 'action link clicks':
-              mappedRow.actionLinkClicks = parseFloat(value) || 0;
+              mappedRow.actionLinkClicks = parseNumber(value);
               break;
             case 'messaging conversations':
-              mappedRow.messagingConversations = parseFloat(value) || 0;
+              mappedRow.messagingConversations = parseNumber(value);
               break;
             case 'device platform':
               mappedRow.devicePlatform = value;
@@ -111,10 +117,10 @@ export const useSheetData = (sheetId: string, range: string = 'Meta!A1:Z') => {
               mappedRow.conversionDevice = value;
               break;
             case 'reach':
-              mappedRow.reach = parseFloat(value) || 0;
+              mappedRow.reach = parseNumber(value);
               break;
             case 'frequency':
-              mappedRow.frequency = parseFloat(value) || 0;
+              mappedRow.frequency = parseNumber(value);
               break;
             case 'ad creative name':
               mappedRow.adCreativeName = value;

@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { MoreHorizontal, TrendingUp, TrendingDown } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { SheetRow } from '@/hooks/useSheetData';
+import { format, parseISO } from 'date-fns';
 
 import { TabSection } from '@/hooks/usePlatformNavigation';
 
@@ -193,7 +194,7 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                     {section === 'campanhas' && (
                       <td className="py-3 px-2">
                         <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
-                          {row.day || 'N/A'}
+                          {row.day ? format(parseISO(row.day), 'dd.MM.yyyy') : 'N/A'}
                         </div>
                       </td>
                     )}
