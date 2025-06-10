@@ -128,13 +128,13 @@ const Index = () => {
 
   const groupedData = useMemo(() => {
     const groups: Record<string, SheetRow[]> = {};
-    filteredData.forEach((row) => {
+    metricsData.forEach((row) => {
       const key = buildCompositeKey(row);
       if (!groups[key]) groups[key] = [];
       groups[key].push(row);
     });
     return groups;
-  }, [filteredData, section]);
+  }, [metricsData, section]);
 
 
   const aggregatedData = useMemo(() => {
@@ -150,8 +150,10 @@ const Index = () => {
       base.costPerActionMessagingConversations = sum('costPerActionMessagingConversations');
       base.actionLinkClicks = sum('actionLinkClicks');
       base.reach = sum('reach');
-      base.frequency = sum('frequency');
+      const uniqueDays = new Set(rows.map(r => r.day)).size || 1;
+      base.frequency = sum('frequency') / uniqueDays;
       base.cpm = rows.reduce((acc, r) => acc + (r.cpm || 0), 0) / rows.length;
+      base.cpc = rows.reduce((acc, r) => acc + (r.cpc || 0), 0) / rows.length;
 
       // ensure we keep the original identifying values rather than the composite key
       base[groupKey] = rows[0][groupKey];

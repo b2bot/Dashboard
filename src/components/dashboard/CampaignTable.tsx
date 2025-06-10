@@ -42,6 +42,14 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
         }).format(num)
       : 'R$ 0,00';
 
+  const formatFrequency = (num?: number) =>
+    typeof num === 'number' && !isNaN(num)
+      ? new Intl.NumberFormat('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(num)
+      : '0,00';
+
   const headerTitle =
     section === 'grupos'
       ? 'Dados Detalhados dos Grupos de Anúncio'
@@ -71,21 +79,25 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
               <thead>
                 {section === 'grupos' ? (
                   <tr className="border-b border-gray-200 dark:border-gray-700">
-                    <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[220px]">Grupo de Anúncio</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[200px]">Grupo de Anúncio</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Investimento</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Alcance</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">CPM</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">CPC</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Conversões</th>
-                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Custo/Conversão</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[110px]">Custo/Conversão</th>
                   </tr>
                 ) : section === 'anuncios' ? (
                   <tr className="border-b border-gray-200 dark:border-gray-700">
                     <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[180px]">Anúncio</th>
                     <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">Criativo</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Frequência</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
-                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Frequência</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Conversões</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Custo/Conversão</th>
                   </tr>
@@ -199,20 +211,46 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                       </td>
                     )}
 
+                    {section === 'grupos' && (
+                      <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                        {formatCurrency(row.amountSpent)}
+                      </td>
+                    )}
+                    {section === 'grupos' && (
+                      <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                        {formatNumber(row.reach)}
+                      </td>
+                    )}
+
                     <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
                       {formatNumber(row.impressions)}
                     </td>
+
+                    {section === 'anuncios' && (
+                      <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                        {formatFrequency(row.frequency)}
+                      </td>
+                    )}
+
+                    {section === 'grupos' && (
+                      <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                        {typeof row.cpm === 'number' && !isNaN(row.cpm) ? `R$ ${row.cpm.toFixed(2)}` : 'R$ 0,00'}
+                      </td>
+                    )}
+
                     <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
                       {formatNumber(row.clicks)}
                     </td>
                     <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
                       {calculateCTR(row.clicks, row.impressions)}%
                     </td>
-                    {section === 'anuncios' && (
+
+                    {section === 'grupos' && (
                       <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
-                        {formatNumber(row.frequency)}
+                        {typeof row.cpc === 'number' && !isNaN(row.cpc) ? `R$ ${row.cpc.toFixed(2)}` : 'R$ 0,00'}
                       </td>
                     )}
+
                     {section === 'campanhas' && (
                       <>
                         <td className="py-3 px-2 text-right">
@@ -225,6 +263,7 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                         </td>
                       </>
                     )}
+
                     <td className="py-3 px-2 text-right">
                       <div className="font-medium text-gray-900 dark:text-gray-100 text-xs">
                         {formatNumber(row.actionMessagingConversationsStarted)}
