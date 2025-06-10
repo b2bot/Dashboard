@@ -31,7 +31,7 @@ const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
   }).format(num) : 'R$ 0,00';
   const formatPercentage = (num: number) => num ? `${num.toFixed(2)}%` : '0,00%';
   const formatFrequency = (num: number) =>
-    num ? new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(num) : '0';
+    num ? new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num) : '0,00';
 
   const campaignMetrics = [
     {
