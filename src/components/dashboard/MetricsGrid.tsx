@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Eye, MousePointer, DollarSign, Users, Target, Zap, Repeat } from 'lucide-react';
 import { SheetRow } from '@/hooks/useSheetData';
 import { TabSection, usePlatformNavigation } from '@/hooks/usePlatformNavigation';
+import { useSettings } from '@/hooks/useSettings';
 
 interface MetricsGridProps {
   data: SheetRow[];
@@ -13,6 +14,7 @@ interface MetricsGridProps {
 
 const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
   const { platform } = usePlatformNavigation();
+  const { settings } = useSettings();
   const totalImpressions = data.reduce((sum, row) => sum + (row.impressions || 0), 0);
   const totalClicks = data.reduce((sum, row) => sum + (row.clicks || 0), 0);
   const totalInvestment = data.reduce((sum, row) => sum + (row.amountSpent || 0), 0);
@@ -211,6 +213,15 @@ const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
 
     metrics = section === 'campanhas' ? campaignMetrics : groupMetrics;
   }
+  
+
+  const order = settings.platforms[platform]?.metrics;
+  if (order && order.length) {
+    metrics = metrics
+      .filter(m => order.includes(m.title))
+      .sort((a, b) => order.indexOf(a.title) - order.indexOf(b.title));
+  }
+
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-6">

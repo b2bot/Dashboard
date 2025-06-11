@@ -1,0 +1,1162 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/src/components/dashboard/AdLevel.tsx b/src/components/dashboard/AdLevel.tsx
+index dea35d1070bd3376814181f1955b2d33ae84f3f9..3b3fb199d671e11e2d41bc840d3ad33e93e2988a 100644
+--- a/src/components/dashboard/AdLevel.tsx
++++ b/src/components/dashboard/AdLevel.tsx
+@@ -1,95 +1,117 @@
+ 
+ import React from 'react';
+ import { Card, CardContent } from '@/components/ui/card';
+ import { Badge } from '@/components/ui/badge';
+ import { Button } from '@/components/ui/button';
+-import { ChevronLeft, Eye, Users, MousePointer, DollarSign } from 'lucide-react';
++import { ChevronLeft, Eye, Users, MousePointer, Repeat, Zap } from 'lucide-react';
+ import { AdGroup } from '@/hooks/useHierarchicalData';
+ 
+ interface AdLevelProps {
+   ads: AdGroup[];
+   adSetName: string;
+   campaignName: string;
+   onBackClick: () => void;
+ }
+ 
+ const AdLevel = ({ ads, adSetName, campaignName, onBackClick }: AdLevelProps) => {
+   const formatNumber = (num?: number) =>
+     typeof num === 'number' && !isNaN(num)
+       ? new Intl.NumberFormat('pt-BR').format(num)
+       : '0';
+ 
+   const formatCurrency = (num?: number) =>
+     typeof num === 'number' && !isNaN(num)
+       ? new Intl.NumberFormat('pt-BR', {
+           style: 'currency',
+           currency: 'BRL'
+         }).format(num) 
+       : 'R$ 0,00';
+ 
+   return (
+     <div className="space-y-4">
+       <div className="flex items-center space-x-4 mb-6">
+         <Button variant="outline" size="sm" onClick={onBackClick}>
+           <ChevronLeft className="w-4 h-4 mr-1" />
+           Voltar
+         </Button>
+         <div>
+           <h2 className="text-xl font-semibold text-gray-900">{adSetName}</h2>
+           <p className="text-sm text-gray-500">{campaignName}</p>
+         </div>
+         <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+           {ads.length} anúncios
+         </Badge>
+       </div>
+ 
+       {ads.map((ad) => (
+         <Card key={ad.id} className="hover:shadow-lg transition-all duration-200 border-0 bg-white/80 backdrop-blur-sm">
+           <CardContent className="p-6">
+             <div className="flex items-center justify-between">
+               <div className="flex-1">
+                 <h3 className="text-lg font-semibold text-gray-900 mb-4">{ad.name}</h3>
+                 
+-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
++                <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+                   <div className="flex items-center space-x-2">
+                     <Eye className="w-4 h-4 text-blue-500" />
+                     <div>
+                       <p className="text-sm text-gray-500">Impressões</p>
+                       <p className="font-semibold">{formatNumber(ad.impressions)}</p>
+                     </div>
+                   </div>
+                   
+                   <div className="flex items-center space-x-2">
+                     <MousePointer className="w-4 h-4 text-green-500" />
+                     <div>
+                       <p className="text-sm text-gray-500">Cliques</p>
+                       <p className="font-semibold">{formatNumber(ad.clicks)}</p>
+                     </div>
+                   </div>
+                   
+                   <div className="flex items-center space-x-2">
+-                    <DollarSign className="w-4 h-4 text-red-500" />
++                    <Repeat className="w-4 h-4 text-red-500" />
+                     <div>
+-                      <p className="text-sm text-gray-500">Gasto</p>
+-                      <p className="font-semibold">{formatCurrency(ad.spent)}</p>
++                      <p className="text-sm text-gray-500">Frequência</p>
++                      <p className="font-semibold">{ad.frequency.toFixed(1)}</p>
+                     </div>
+                   </div>
+-                  
++
+                   <div className="flex items-center space-x-2">
+                     <Users className="w-4 h-4 text-purple-500" />
+                     <div>
+                       <p className="text-sm text-gray-500">Conversões</p>
+                       <p className="font-semibold">{formatNumber(ad.conversions)}</p>
+                     </div>
+                   </div>
++
++                  <div className="flex items-center space-x-2">
++                    <Zap className="w-4 h-4 text-orange-500" />
++                    <div>
++                      <p className="text-sm text-gray-500">Taxa de Conversão</p>
++                      <p className="font-semibold">
++                        {formatNumber(
++                          ad.actionLinkClicks > 0 ? (ad.conversions / ad.actionLinkClicks) * 100 : 0
++                        )}%
++                      </p>
++                    </div>
++                  </div>
++
++                  <div className="flex items-center space-x-2">
++                    <Zap className="w-4 h-4 text-red-500" />
++                    <div>
++                      <p className="text-sm text-gray-500">Custo/Conversão</p>
++                      <p className="font-semibold">
++                        {formatCurrency(ad.conversions > 0 ? ad.spent / ad.conversions : 0)}
++                      </p>
++                    </div>
++                  </div>
+                 </div>
+               </div>
+             </div>
+           </CardContent>
+         </Card>
+       ))}
+     </div>
+   );
+ };
+ 
+ export default AdLevel;
+diff --git a/src/components/dashboard/AdSetLevel.tsx b/src/components/dashboard/AdSetLevel.tsx
+index 935585a9d0ae7581d27a3e4313088db3b483d54c..fa06696084e79eb08916d32af25bdbb545dbf8bb 100644
+--- a/src/components/dashboard/AdSetLevel.tsx
++++ b/src/components/dashboard/AdSetLevel.tsx
+@@ -1,107 +1,133 @@
+ 
+ import React from 'react';
+ import { Card, CardContent } from '@/components/ui/card';
+ import { Badge } from '@/components/ui/badge';
+ import { Button } from '@/components/ui/button';
+-import { ChevronRight, ChevronLeft, Eye, Users, MousePointer, DollarSign } from 'lucide-react';
++import { ChevronRight, ChevronLeft, Eye, Users, MousePointer, Repeat, Zap } from 'lucide-react';
+ import { AdSetGroup } from '@/hooks/useHierarchicalData';
+ 
+ interface AdSetLevelProps {
+   adSets: AdSetGroup[];
+   campaignName: string;
+   onAdSetClick: (adSet: AdSetGroup) => void;
+   onBackClick: () => void;
+ }
+ 
+ const AdSetLevel = ({ adSets, campaignName, onAdSetClick, onBackClick }: AdSetLevelProps) => {
+   const formatNumber = (num?: number) =>
+     typeof num === 'number' && !isNaN(num)
+       ? new Intl.NumberFormat('pt-BR').format(num)
+       : '0';
+ 
+   const formatCurrency = (num?: number) =>
+     typeof num === 'number' && !isNaN(num)
+       ? new Intl.NumberFormat('pt-BR', {
+           style: 'currency',
+           currency: 'BRL'
+         }).format(num) 
+       : 'R$ 0,00';
+ 
+   return (
+     <div className="space-y-4">
+       <div className="flex items-center space-x-4 mb-6">
+         <Button variant="outline" size="sm" onClick={onBackClick}>
+           <ChevronLeft className="w-4 h-4 mr-1" />
+           Voltar
+         </Button>
+         <h2 className="text-xl font-semibold text-gray-900">{campaignName}</h2>
+         <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+           {adSets.length} grupos de anúncio
+         </Badge>
+       </div>
+ 
+       {adSets.map((adSet) => (
+         <Card key={adSet.adSetName} className="hover:shadow-lg transition-all duration-200 border-0 bg-white/80 backdrop-blur-sm">
+           <CardContent className="p-6">
+             <div className="flex items-center justify-between">
+               <div className="flex-1">
+                 <div className="flex items-center space-x-3 mb-4">
+                   <h3 className="text-lg font-semibold text-gray-900">{adSet.adSetName}</h3>
+                   <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                     {adSet.ads.length} anúncios
+                   </Badge>
+                 </div>
+                 
+-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
++                <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+                   <div className="flex items-center space-x-2">
+                     <Eye className="w-4 h-4 text-blue-500" />
+                     <div>
+                       <p className="text-sm text-gray-500">Impressões</p>
+                       <p className="font-semibold">{formatNumber(adSet.totalImpressions)}</p>
+                     </div>
+                   </div>
+                   
+                   <div className="flex items-center space-x-2">
+                     <MousePointer className="w-4 h-4 text-green-500" />
+                     <div>
+                       <p className="text-sm text-gray-500">Cliques</p>
+                       <p className="font-semibold">{formatNumber(adSet.totalClicks)}</p>
+                     </div>
+                   </div>
+                   
+                   <div className="flex items-center space-x-2">
+-                    <DollarSign className="w-4 h-4 text-red-500" />
++                    <Repeat className="w-4 h-4 text-red-500" />
+                     <div>
+-                      <p className="text-sm text-gray-500">Gasto</p>
+-                      <p className="font-semibold">{formatCurrency(adSet.totalSpent)}</p>
++                      <p className="text-sm text-gray-500">Frequência</p>
++                      <p className="font-semibold">{(adSet.totalFrequency / adSet.ads.length).toFixed(1)}</p>
+                     </div>
+                   </div>
+-                  
++
+                   <div className="flex items-center space-x-2">
+                     <Users className="w-4 h-4 text-purple-500" />
+                     <div>
+                       <p className="text-sm text-gray-500">Conversões</p>
+                       <p className="font-semibold">{formatNumber(adSet.totalConversions)}</p>
+                     </div>
+                   </div>
++
++                  <div className="flex items-center space-x-2">
++                    <Zap className="w-4 h-4 text-orange-500" />
++                    <div>
++                      <p className="text-sm text-gray-500">Taxa de Conversão</p>
++                      <p className="font-semibold">
++                        {formatNumber(
++                          adSet.totalActionLinkClicks > 0
++                            ? (adSet.totalConversions / adSet.totalActionLinkClicks) * 100
++                            : 0
++                        )}%
++                      </p>
++                    </div>
++                  </div>
++
++                  <div className="flex items-center space-x-2">
++                    <Zap className="w-4 h-4 text-red-500" />
++                    <div>
++                      <p className="text-sm text-gray-500">Custo/Conversão</p>
++                      <p className="font-semibold">
++                        {formatCurrency(
++                          adSet.totalConversions > 0 ? adSet.totalSpent / adSet.totalConversions : 0
++                        )}
++                      </p>
++                    </div>
++                  </div>
+                 </div>
+               </div>
+               
+               <Button
+                 variant="ghost"
+                 size="sm"
+                 onClick={() => onAdSetClick(adSet)}
+                 className="ml-4 hover:bg-gray-100"
+               >
+                 Ver anúncios
+                 <ChevronRight className="w-4 h-4 ml-1" />
+               </Button>
+             </div>
+           </CardContent>
+         </Card>
+       ))}
+     </div>
+   );
+ };
+ 
+ export default AdSetLevel;
+diff --git a/src/components/dashboard/CampaignLevel.tsx b/src/components/dashboard/CampaignLevel.tsx
+index 720cdefa08226330e70e7b58b54cfad5cfba5cf6..fe9144f13a2c65e38e1e9216da39f67a55a49a01 100644
+--- a/src/components/dashboard/CampaignLevel.tsx
++++ b/src/components/dashboard/CampaignLevel.tsx
+@@ -1,87 +1,98 @@
+ 
+ import React from 'react';
+ import { Card, CardContent } from '@/components/ui/card';
+ import { Badge } from '@/components/ui/badge';
+-import { Button } from '@/components/ui/button';
+-import { ChevronRight, Eye, Users, MousePointer, DollarSign } from 'lucide-react';
++import { Eye, Users, MousePointer, Zap } from 'lucide-react';
+ import { CampaignGroup } from '@/hooks/useHierarchicalData';
+ 
+ interface CampaignLevelProps {
+   campaigns: CampaignGroup[];
+   onCampaignClick: (campaign: CampaignGroup) => void;
+ }
+ 
+ const CampaignLevel = ({ campaigns, onCampaignClick }: CampaignLevelProps) => {
+   const formatNumber = (num: number) => num ? new Intl.NumberFormat('pt-BR').format(num) : '0';
+   const formatCurrency = (num: number) => num ? new Intl.NumberFormat('pt-BR', {
+     style: 'currency',
+     currency: 'BRL'
+   }).format(num) : 'R$ 0,00';
+ 
+   return (
+     <div className="space-y-4">
+       {campaigns.map((campaign) => (
+         <Card key={campaign.campaignName} className="hover:shadow-lg transition-all duration-200 border-0 bg-white/80 backdrop-blur-sm">
+           <CardContent className="p-6">
+             <div className="flex items-center justify-between">
+               <div className="flex-1">
+                 <div className="flex items-center space-x-3 mb-4">
+                   <h3 className="text-lg font-semibold text-gray-900">{campaign.campaignName}</h3>
+                   <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                     {campaign.adSets.length} grupos
+                   </Badge>
+                 </div>
+                 
+-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
++                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                   <div className="flex items-center space-x-2">
+                     <Eye className="w-4 h-4 text-blue-500" />
+                     <div>
+                       <p className="text-sm text-gray-500">Impressões</p>
+                       <p className="font-semibold">{formatNumber(campaign.totalImpressions)}</p>
+                     </div>
+                   </div>
+-                  
++
+                   <div className="flex items-center space-x-2">
+                     <MousePointer className="w-4 h-4 text-green-500" />
+                     <div>
+                       <p className="text-sm text-gray-500">Cliques</p>
+                       <p className="font-semibold">{formatNumber(campaign.totalClicks)}</p>
+                     </div>
+                   </div>
+-                  
++
+                   <div className="flex items-center space-x-2">
+-                    <DollarSign className="w-4 h-4 text-red-500" />
++                    <Users className="w-4 h-4 text-purple-500" />
+                     <div>
+-                      <p className="text-sm text-gray-500">Gasto</p>
+-                      <p className="font-semibold">{formatCurrency(campaign.totalSpent)}</p>
++                      <p className="text-sm text-gray-500">Conversões</p>
++                      <p className="font-semibold">{formatNumber(campaign.totalConversions)}</p>
+                     </div>
+                   </div>
+-                  
++
+                   <div className="flex items-center space-x-2">
+-                    <Users className="w-4 h-4 text-purple-500" />
++                    <Zap className="w-4 h-4 text-orange-500" />
+                     <div>
+-                      <p className="text-sm text-gray-500">Conversões</p>
+-                      <p className="font-semibold">{formatNumber(campaign.totalConversions)}</p>
++                      <p className="text-sm text-gray-500">Taxa de Conversão</p>
++                      <p className="font-semibold">
++                        {formatNumber(
++                          campaign.totalActionLinkClicks > 0
++                            ? (campaign.totalConversions / campaign.totalActionLinkClicks) * 100
++                            : 0
++                        )}%
++                      </p>
++                    </div>
++                  </div>
++
++                  <div className="flex items-center space-x-2">
++                    <Zap className="w-4 h-4 text-red-500" />
++                    <div>
++                      <p className="text-sm text-gray-500">Custo/Conversão</p>
++                      <p className="font-semibold">
++                        {formatCurrency(
++                          campaign.totalConversions > 0
++                            ? campaign.totalSpent / campaign.totalConversions
++                            : 0
++                        )}
++                      </p>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+               
+-              <Button
+-                variant="ghost"
+-                size="sm"
+-                onClick={() => onCampaignClick(campaign)}
+-                className="ml-4 hover:bg-gray-100"
+-              >
+-                Ver grupos
+-                <ChevronRight className="w-4 h-4 ml-1" />
+-              </Button>
++              
+             </div>
+           </CardContent>
+         </Card>
+       ))}
+     </div>
+   );
+ };
+ 
+ export default CampaignLevel;
+diff --git a/src/components/dashboard/CampaignTable.tsx b/src/components/dashboard/CampaignTable.tsx
+index 8951e5f8759b135b3e540b7d6af6c46718f6f53a..7e07ac18f80911a9226206ed8ac778938a3e8a32 100644
+--- a/src/components/dashboard/CampaignTable.tsx
++++ b/src/components/dashboard/CampaignTable.tsx
+@@ -1,30 +1,31 @@
+ import React from 'react';
+ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+ import { Badge } from '@/components/ui/badge';
+ import { Button } from '@/components/ui/button';
+ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
++import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
+ import { MoreHorizontal, TrendingUp, TrendingDown } from 'lucide-react';
+ import { SheetRow } from '@/hooks/useSheetData';
+ 
+ import { TabSection } from '@/hooks/usePlatformNavigation';
+ 
+ interface CampaignTableProps {
+   data: SheetRow[];
+   section?: TabSection;
+ }
+ 
+ 
+ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
+ 
+ 
+   const calculateCTR = (clicks: number, impressions: number) => {
+     return impressions > 0 ? ((clicks / impressions) * 100).toFixed(2) : '0.00';
+   };
+ 
+   const truncateText = (text: string, maxLength: number = 20) => {
+     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+   };
+ 
+   const formatNumber = (num?: number) =>
+     typeof num === 'number' && !isNaN(num)
+       ? new Intl.NumberFormat('pt-BR').format(num)
+@@ -44,65 +45,90 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
+       ? 'Dados Detalhados dos Grupos de Anúncio'
+       : section === 'anuncios'
+         ? 'Dados Detalhados dos Anúncios'
+         : 'Dados Detalhados das Campanhas';
+ 
+   const firstColHeader =
+     section === 'grupos' ? 'Grupo de Anúncio' : section === 'anuncios' ? 'Anúncio' : 'Campanha';
+ 
+   return (
+     <TooltipProvider>
+       <Card className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+         <CardHeader className="pb-3">
+           <div className="flex items-center justify-between">
+             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+               {headerTitle}
+             </CardTitle>
+             <Badge variant="outline" className="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-700 transition-all duration-200 hover:scale-105">
+               {data.length} registros
+             </Badge>
+           </div>
+         </CardHeader>
+         <CardContent>
+           <div className="overflow-x-auto">
+             <table className="w-full text-sm">
+               <thead>
+-                <tr className="border-b border-gray-200 dark:border-gray-700">
+-                  <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[200px]">{firstColHeader}</th>
+-                  <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Data</th>
+-                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
+-                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
+-                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
+-                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Gasto</th>
+-                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">CPM</th>
+-                  <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Conversas</th>
+-                  <th className="text-center py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">Ações</th>
+-                </tr>
++                {section === 'grupos' ? (
++                  <tr className="border-b border-gray-200 dark:border-gray-700">
++                    <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[220px]">Grupo de Anúncio</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Conversões</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Custo/Conversão</th>
++                  </tr>
++                ) : section === 'anuncios' ? (
++                  <tr className="border-b border-gray-200 dark:border-gray-700">
++                    <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[180px]">Anúncio</th>
++                    <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">Criativo</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Frequência</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Conversões</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Custo/Conversão</th>
++                  </tr>
++                ) : (
++                  <tr className="border-b border-gray-200 dark:border-gray-700">
++                    <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[200px]">{firstColHeader}</th>
++                    <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Data</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Impressões</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Cliques</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">CTR</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Gasto</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">CPM</th>
++                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Conversas</th>
++                    <th className="text-center py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[60px]">Ações</th>
++                  </tr>
++                )}
+               </thead>
+               <tbody>
+                 {data.slice(0, 20).map((row, index) => (
+-                  <tr key={index} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/10 dark:hover:to-purple-900/10 transition-all duration-200 group/row">
++                  <tr
++                    key={index}
++                    className="border-b border-gray-100 dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/10 dark:hover:to-purple-900/10 transition-all duration-200 group/row"
++                  >
+                     <td className="py-3 px-4">
+                       <div className="flex items-center space-x-2">
+                         <div className="min-w-0 flex-1">
+                           <Tooltip>
+                             <TooltipTrigger asChild>
+                               <div className="font-medium text-gray-900 dark:text-gray-100 text-xs cursor-help truncate">
+                                 {truncateText(
+                                   (section === 'grupos'
+                                     ? row.adSetName
+                                     : section === 'anuncios'
+                                       ? row.adName
+                                       : row.campaignName) || 'N/A',
+                                   25
+                                 )}
+                               </div>
+                             </TooltipTrigger>
+                             <TooltipContent className="bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 p-2 rounded-lg shadow-lg">
+                               <p className="font-medium">
+                                 {section === 'grupos'
+                                   ? row.adSetName || 'N/A'
+                                   : section === 'anuncios'
+                                     ? row.adName || 'N/A'
+                                     : row.campaignName || 'N/A'}
+                               </p>
+                             </TooltipContent>
+@@ -126,88 +152,121 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
+                                     : row.campaignName || 'N/A'}
+                                 </p>
+                               </TooltipContent>
+                             </Tooltip>
+                           )}
+                           {section === 'anuncios' && (
+                             <Tooltip>
+                               <TooltipTrigger asChild>
+                                 <div className="text-xs text-gray-500 dark:text-gray-400 cursor-help truncate">
+                                   {truncateText(row.campaignName || 'N/A', 25)}
+                                 </div>
+                               </TooltipTrigger>
+                               <TooltipContent className="bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 p-2 rounded-lg shadow-lg">
+                                 <p>{row.campaignName || 'N/A'}</p>
+                               </TooltipContent>
+                             </Tooltip>
+                           )}
+                         </div>
+                         {row.clicks > 100 ? (
+                           <TrendingUp className="w-3 h-3 text-green-500 transition-transform duration-200 group-hover/row:scale-110" />
+                         ) : (
+                           <TrendingDown className="w-3 h-3 text-red-500 transition-transform duration-200 group-hover/row:scale-110" />
+                         )}
+                       </div>
+                     </td>
+-                    <td className="py-3 px-2">
+-                      <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
+-                        {row.day || 'N/A'}
+-                      </div>
+-                    </td>
+-
+-
+-                    <td className="py-3 px-2">
+-                      <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
+-                        {row.accountName || 'N/A'}
+-                      </div>
+-                    </td>
++                    {section === 'anuncios' && (
++                      <td className="py-3 px-2">
++                        {row.thumbnailUrl ? (
++                          <Dialog>
++                            <DialogTrigger asChild>
++                              <img
++                                src={row.thumbnailUrl}
++                                alt="thumb"
++                                className="w-10 h-10 rounded cursor-pointer"
++                              />
++                            </DialogTrigger>
++                            <DialogContent className="p-0 bg-transparent border-none max-w-max">
++                              <img src={row.thumbnailUrl} alt="preview" className="max-w-full h-auto" />
++                            </DialogContent>
++                          </Dialog>
++                        ) : (
++                          <span className="text-xs text-gray-500">N/A</span>
++                        )}
++                      </td>
++                    )}
++                    {section === 'campanhas' && (
++                      <td className="py-3 px-2">
++                        <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
++                          {row.day || 'N/A'}
++                        </div>
++                      </td>
++                    )}
+ 
+                     <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                       {formatNumber(row.impressions)}
+                     </td>
+                     <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                       {formatNumber(row.clicks)}
+                     </td>
+                     <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+                       {calculateCTR(row.clicks, row.impressions)}%
+                     </td>
+-                    <td className="py-3 px-2 text-right">
+-                      <div className="font-medium text-gray-900 dark:text-gray-100 text-xs">
+-                        {formatCurrency(row.amountSpent)}
+-                      </div>
+-                    </td>
+-                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
+-                      {typeof row.cpm === 'number' && !isNaN(row.cpm) ? `R$ ${row.cpm.toFixed(2)}` : 'R$ 0,00'}
+-                    </td>
++                    {section === 'anuncios' && (
++                      <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
++                        {formatNumber(row.frequency)}
++                      </td>
++                    )}
++                    {section === 'campanhas' && (
++                      <>
++                        <td className="py-3 px-2 text-right">
++                          <div className="font-medium text-gray-900 dark:text-gray-100 text-xs">
++                            {formatCurrency(row.amountSpent)}
++                          </div>
++                        </td>
++                        <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
++                          {typeof row.cpm === 'number' && !isNaN(row.cpm) ? `R$ ${row.cpm.toFixed(2)}` : 'R$ 0,00'}
++                        </td>
++                      </>
++                    )}
+                     <td className="py-3 px-2 text-right">
+                       <div className="font-medium text-gray-900 dark:text-gray-100 text-xs">
+                         {formatNumber(row.actionMessagingConversationsStarted)}
+                       </div>
+                     </td>
+-                    <td className="py-3 px-2 text-center">
+-                      <Button 
+-                        variant="ghost" 
+-                        size="sm" 
+-                        className="hover:bg-blue-50 dark:hover:bg-blue-900/20 h-6 w-6 p-0 transition-all duration-200 hover:scale-110"
+-                      >
+-                        <MoreHorizontal className="w-3 h-3" />
+-                      </Button>
++                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-gray-100 text-xs">
++                      {formatCurrency(
++                        row.actionMessagingConversationsStarted > 0
++                          ? row.amountSpent / row.actionMessagingConversationsStarted
++                          : 0
++                      )}
+                     </td>
++                    {section === 'campanhas' && (
++                      <td className="py-3 px-2 text-center">
++                        <Button
++                          variant="ghost"
++                          size="sm"
++                          className="hover:bg-blue-50 dark:hover:bg-blue-900/20 h-6 w-6 p-0 transition-all duration-200 hover:scale-110"
++                        >
++                          <MoreHorizontal className="w-3 h-3" />
++                        </Button>
++                      </td>
++                    )}
+                   </tr>
+                 ))}
+               </tbody>
+             </table>
+             {data.length > 20 && (
+               <div className="mt-4 text-center">
+                 <Badge variant="outline" className="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 transition-all duration-200 hover:scale-105">
+                   Mostrando 20 de {data.length} registros
+                 </Badge>
+               </div>
+             )}
+           </div>
+         </CardContent>
+       </Card>
+     </TooltipProvider>
+   );
+ };
+ 
+ export default CampaignTable;
+diff --git a/src/components/dashboard/MetricsGrid.tsx b/src/components/dashboard/MetricsGrid.tsx
+index 0b8da657ff7e4a8b744d91c437dd87e655a04c83..ea1296ab77aa4679ffd86968c4312528ac326b00 100644
+--- a/src/components/dashboard/MetricsGrid.tsx
++++ b/src/components/dashboard/MetricsGrid.tsx
+@@ -1,112 +1,174 @@
+ 
+ import React from 'react';
+ import { Card, CardContent } from '@/components/ui/card';
+ import { Badge } from '@/components/ui/badge';
+-import { TrendingUp, TrendingDown, Eye, MousePointer, DollarSign, Users, Target, Zap } from 'lucide-react';
++import { TrendingUp, TrendingDown, Eye, MousePointer, DollarSign, Users, Target, Zap, Repeat } from 'lucide-react';
+ import { SheetRow } from '@/hooks/useSheetData';
++import { TabSection } from '@/hooks/usePlatformNavigation';
+ 
+ interface MetricsGridProps {
+   data: SheetRow[];
++  section?: TabSection;
+ }
+ 
+-const MetricsGrid = ({ data }: MetricsGridProps) => {
++const MetricsGrid = ({ data, section = 'campanhas' }: MetricsGridProps) => {
+   const totalImpressions = data.reduce((sum, row) => sum + (row.impressions || 0), 0);
+   const totalClicks = data.reduce((sum, row) => sum + (row.clicks || 0), 0);
+   const totalInvestment = data.reduce((sum, row) => sum + (row.amountSpent || 0), 0);
+   const totalConversions = data.reduce((sum, row) => sum + (row.actionMessagingConversationsStarted || 0), 0);
+-  const totalCostPerConversion = data.length > 0 ? 
++  const totalCostPerConversion = data.length > 0 ?
+     data.reduce((sum, row) => sum + (row.costPerActionMessagingConversations || 0), 0) / data.length : 0;
+   const totalActionLinkClicks = data.reduce((sum, row) => sum + (row.actionLinkClicks || 0), 0);
++  const totalFrequency = data.reduce((sum, row) => sum + (row.frequency || 0), 0);
+   
+   // Taxa de conversão: Conversões ÷ Action Link Clicks
+   const conversionRate = totalActionLinkClicks > 0 ? (totalConversions / totalActionLinkClicks) * 100 : 0;
+ 
+   const formatNumber = (num: number) => num ? new Intl.NumberFormat('pt-BR').format(num) : '0';
+   const formatCurrency = (num: number) => num ? new Intl.NumberFormat('pt-BR', {
+     style: 'currency',
+     currency: 'BRL'
+   }).format(num) : 'R$ 0,00';
+   const formatPercentage = (num: number) => num ? `${num.toFixed(2)}%` : '0,00%';
+ 
+-  const metrics = [
++  const campaignMetrics = [
+     {
+       title: 'Impressões',
+       value: formatNumber(totalImpressions),
+       icon: Eye,
+       color: 'text-blue-600 dark:text-blue-400',
+       bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+       trend: '+12.5%',
+       trendUp: true,
+     },
+     {
+       title: 'Cliques',
+       value: formatNumber(totalClicks),
+       icon: MousePointer,
+       color: 'text-green-600 dark:text-green-400',
+       bgColor: 'bg-green-50 dark:bg-green-900/20',
+       trend: '+8.2%',
+       trendUp: true,
+     },
+     {
+       title: 'Investimento',
+       value: formatCurrency(totalInvestment),
+       icon: DollarSign,
+       color: 'text-red-600 dark:text-red-400',
+       bgColor: 'bg-red-50 dark:bg-red-900/20',
+       trend: '+3.1%',
+       trendUp: true,
+     },
+     {
+       title: 'Conversões',
+       value: formatNumber(totalConversions),
+       icon: Target,
+       color: 'text-purple-600 dark:text-purple-400',
+       bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+       trend: '+15.7%',
+       trendUp: true,
+     },
++    {
++      title: 'Taxa de Conversão',
++      value: formatPercentage(conversionRate),
++      icon: Users,
++      color: 'text-indigo-600 dark:text-indigo-400',
++      bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
++      trend: '+0.8%',
++      trendUp: true,
++    },
+     {
+       title: 'Custo/Conversão',
+       value: formatCurrency(totalCostPerConversion),
+       icon: Zap,
+       color: 'text-orange-600 dark:text-orange-400',
+       bgColor: 'bg-orange-50 dark:bg-orange-900/20',
+       trend: '-2.1%',
+       trendUp: false,
+     },
++  ];
++
++  const groupMetrics = [
++    {
++      title: 'Impressões',
++      value: formatNumber(totalImpressions),
++      icon: Eye,
++      color: 'text-blue-600 dark:text-blue-400',
++      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
++      trend: '+12.5%',
++      trendUp: true,
++    },
++    {
++      title: 'Cliques',
++      value: formatNumber(totalClicks),
++      icon: MousePointer,
++      color: 'text-green-600 dark:text-green-400',
++      bgColor: 'bg-green-50 dark:bg-green-900/20',
++      trend: '+8.2%',
++      trendUp: true,
++    },
++    {
++      title: 'Frequência',
++      value: (totalFrequency / (data.length || 1)).toFixed(1),
++      icon: Repeat,
++      color: 'text-red-600 dark:text-red-400',
++      bgColor: 'bg-red-50 dark:bg-red-900/20',
++      trend: '+3.1%',
++      trendUp: true,
++    },
++    {
++      title: 'Conversões',
++      value: formatNumber(totalConversions),
++      icon: Target,
++      color: 'text-purple-600 dark:text-purple-400',
++      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
++      trend: '+15.7%',
++      trendUp: true,
++    },
+     {
+       title: 'Taxa de Conversão',
+       value: formatPercentage(conversionRate),
+       icon: Users,
+       color: 'text-indigo-600 dark:text-indigo-400',
+       bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
+       trend: '+0.8%',
+       trendUp: true,
+     },
++    {
++      title: 'Custo/Conversão',
++      value: formatCurrency(totalCostPerConversion),
++      icon: Zap,
++      color: 'text-orange-600 dark:text-orange-400',
++      bgColor: 'bg-orange-50 dark:bg-orange-900/20',
++      trend: '-2.1%',
++      trendUp: false,
++    },
+   ];
+ 
++  const metrics = section === 'campanhas' ? campaignMetrics : groupMetrics;
++
+   return (
+     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-6">
+       {metrics.map((metric, index) => {
+         const Icon = metric.icon;
+         const TrendIcon = metric.trendUp ? TrendingUp : TrendingDown;
+         
+         return (
+           <Card 
+             key={index} 
+             className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:scale-[1.02]"
+           >
+             <CardContent className="p-6">
+               <div className="flex items-center justify-between">
+                 <div className="flex items-center space-x-3">
+                   <div className={`p-3 rounded-xl ${metric.bgColor} group-hover:scale-110 transition-transform duration-200`}>
+                     <Icon className={`w-6 h-6 ${metric.color}`} />
+                   </div>
+                   <div>
+                     <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{metric.title}</p>
+                     <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{metric.value}</p>
+                   </div>
+                 </div>
+                 <div className="text-right">
+                   <Badge 
+                     variant="outline" 
+diff --git a/src/hooks/useHierarchicalData.ts b/src/hooks/useHierarchicalData.ts
+index 069d1b62b1f8fe7f971666060bbee94f0e80ce4e..bea4cf95858ae00bb6d22e4a9e7a1fa68bde5b06 100644
+--- a/src/hooks/useHierarchicalData.ts
++++ b/src/hooks/useHierarchicalData.ts
+@@ -1,103 +1,119 @@
+ 
+ import { useMemo } from 'react';
+ import { SheetRow } from './useSheetData';
+ 
+ export interface CampaignGroup {
+   campaignName: string;
+   adSets: AdSetGroup[];
+   totalImpressions: number;
+   totalClicks: number;
+   totalSpent: number;
+   totalConversions: number;
++  totalActionLinkClicks: number;
++  totalFrequency: number;
+ }
+ 
+ export interface AdSetGroup {
+   adSetName: string;
+   campaignName: string;
+   ads: AdGroup[];
+   totalImpressions: number;
+   totalClicks: number;
+   totalSpent: number;
+   totalConversions: number;
++  totalActionLinkClicks: number;
++  totalFrequency: number;
+ }
+ 
+ export interface AdGroup {
+   id: string;
+   name: string;
+   adSetName: string;
+   campaignName: string;
+   impressions: number;
+   clicks: number;
+   spent: number;
+   conversions: number;
++  actionLinkClicks: number;
++  frequency: number;
+ }
+ 
+ export const useHierarchicalData = (data: SheetRow[]) => {
+   const campaignGroups = useMemo(() => {
+     const groups: Record<string, CampaignGroup> = {};
+ 
+     data.forEach(row => {
+       if (!row.campaignName) return;
+       
+       if (!groups[row.campaignName]) {
+         groups[row.campaignName] = {
+           campaignName: row.campaignName,
+           adSets: [],
+           totalImpressions: 0,
+           totalClicks: 0,
+           totalSpent: 0,
+           totalConversions: 0,
++          totalActionLinkClicks: 0,
++          totalFrequency: 0,
+         };
+       }
+ 
+       const campaign = groups[row.campaignName];
+       campaign.totalImpressions += row.impressions || 0;
+       campaign.totalClicks += row.clicks || 0;
+       campaign.totalSpent += row.amountSpent || 0;
+       campaign.totalConversions += row.actionMessagingConversationsStarted || 0;
++      campaign.totalActionLinkClicks += row.actionLinkClicks || 0;
++      campaign.totalFrequency += row.frequency || 0;
+ 
+       // Find or create ad set
+       let adSet = campaign.adSets.find(as => as.adSetName === row.adSetName);
+       if (!adSet && row.adSetName) {
+         adSet = {
+           adSetName: row.adSetName,
+           campaignName: row.campaignName,
+           ads: [],
+           totalImpressions: 0,
+           totalClicks: 0,
+           totalSpent: 0,
+           totalConversions: 0,
++          totalActionLinkClicks: 0,
++          totalFrequency: 0,
+         };
+         campaign.adSets.push(adSet);
+       }
+ 
+       if (adSet) {
+         adSet.totalImpressions += row.impressions || 0;
+         adSet.totalClicks += row.clicks || 0;
+         adSet.totalSpent += row.amountSpent || 0;
+         adSet.totalConversions += row.actionMessagingConversationsStarted || 0;
++        adSet.totalActionLinkClicks += row.actionLinkClicks || 0;
++        adSet.totalFrequency += row.frequency || 0;
+ 
+         // Create ad entry if adName exists
+         if (row.adName) {
+           const existingAd = adSet.ads.find(ad => ad.name === row.adName);
+           if (!existingAd) {
+             adSet.ads.push({
+               id: `${row.adSetName}-${row.adName}`,
+               name: row.adName,
+               adSetName: row.adSetName,
+               campaignName: row.campaignName,
+               impressions: row.impressions || 0,
+               clicks: row.clicks || 0,
+               spent: row.amountSpent || 0,
+               conversions: row.actionMessagingConversationsStarted || 0,
++              actionLinkClicks: row.actionLinkClicks || 0,
++              frequency: row.frequency || 0,
+             });
+           }
+         }
+       }
+     });
+ 
+     return Object.values(groups);
+   }, [data]);
+ 
+   return { campaignGroups };
+ };
+diff --git a/src/hooks/useSheetData.ts b/src/hooks/useSheetData.ts
+index e0d8f62a2c99bdb6166576709d07eb893cb5891f..65e37c79797432b68ae8a3d8e1de5140331406cb 100644
+--- a/src/hooks/useSheetData.ts
++++ b/src/hooks/useSheetData.ts
+@@ -55,104 +55,86 @@ export const useSheetData = (sheetId: string, range: string = 'Meta!A1:Z') => {
+           const value = row[index] || '';
+           const headerKey = header.toLowerCase();
+ 
+           // Mapear colunas específicas utilizando o nome exato do cabeçalho
+           switch (headerKey) {
+             case 'account name':
+               mappedRow.accountName = value;
+               break;
+             case 'campaign name':
+               mappedRow.campaignName = value;
+               break;
+             case 'adset name':
+               mappedRow.adSetName = value;
+               break;
+             case 'ad name':
+               mappedRow.adName = value;
+               break;
+             case 'impressions':
+               mappedRow.impressions = parseFloat(value) || 0;
+               break;
+             case 'clicks':
+               mappedRow.clicks = parseFloat(value) || 0;
+               break;
+             case 'spend (cost, amount spent)':
+             case 'amount spent':
+-            case 'spend (cost, amount spent)':
+               mappedRow.amountSpent = parseFloat(value) || 0;
+               break;
+             case 'cpm (cost per 1000 impressions)':
+             case 'cpm':
+               mappedRow.cpm = parseFloat(value) || 0;
+               break;
+             case 'cpc (cost per click)':
+             case 'cpc':
+               mappedRow.cpc = parseFloat(value) || 0;
+               break;
+             case 'ctr (clickthrough rate)':
+             case 'ctr':
+               mappedRow.ctr = parseFloat(value) || 0;
+               break;
+             case 'action messaging conversations started (onsite conversion)':
+               mappedRow.actionMessagingConversationsStarted = parseFloat(value) || 0;
+               mappedRow.messagingConversations = parseFloat(value) || 0;
+               break;
+             case 'cost per action messaging conversations started (onsite conversion)':
+               mappedRow.costPerActionMessagingConversations = parseFloat(value) || 0;
+               break;
+             case 'action link clicks':
+               mappedRow.actionLinkClicks = parseFloat(value) || 0;
+               break;
+             case 'messaging conversations':
+               mappedRow.messagingConversations = parseFloat(value) || 0;
+               break;
+             case 'device platform':
+               mappedRow.devicePlatform = value;
+               break;
+             case 'conversion device':
+               mappedRow.conversionDevice = value;
+               break;
+             case 'reach':
+               mappedRow.reach = parseFloat(value) || 0;
+               break;
+             case 'frequency':
+               mappedRow.frequency = parseFloat(value) || 0;
+               break;
+             case 'ad creative name':
+               mappedRow.adCreativeName = value;
+               break;
+-            case 'thumbnail url':
+-              mappedRow.thumbnailUrl = value;
+-
+-            case 'cpm':
+-            case 'cpm (cost per 1000 impressions)':
+-              mappedRow.cpm = parseFloat(value) || 0;
+-
+-              break;
+-            case 'cpc (cost per click)':
+-              mappedRow.cpc = parseFloat(value) || 0;
+-              break;
+-            case 'ctr (clickthrough rate)':
+-              mappedRow.ctr = parseFloat(value) || 0;
+-              break;
+-            case 'adcreative name':
+-              mappedRow.adcreativeName = value;
+-              break;
+             case 'thumbnail url':
+               mappedRow.thumbnailUrl = value;
+               break;
+             case 'day':
+             case 'date':
+               mappedRow.day = value;
+               break;
+             default:
+               // Manter outras colunas como estão
+               mappedRow[header] = value;
+           }
+         });
+ 
+         return mappedRow as SheetRow;
+       });
+     },
+     enabled: !!sheetId,
+   });
+ };
+diff --git a/src/pages/Index.tsx b/src/pages/Index.tsx
+index 57b0a1fe15619ee4fdf1dda2e32e4d964fca4cc9..c2a6197e1b08c82a6a22191c2f543af554bcd53b 100644
+--- a/src/pages/Index.tsx
++++ b/src/pages/Index.tsx
+@@ -252,51 +252,51 @@ const Index = () => {
+     }
+ 
+     return <CampaignTable data={filteredData} section="campanhas" />;
+   };
+ 
+   return (
+     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 transition-colors duration-300">
+       <PlatformNavigation />
+       <SectionTabs accounts={uniqueAccounts} data={filteredData} />
+       
+       <main className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+         {/* Filters and Platform header */}
+         <div className="py-3">
+           <div className="flex flex-col lg:flex-row gap-3 items-start">
+ 		    {/*
+             <div className="flex-1">
+               <AdvancedFilters data={data || []} platformName={platformConfig?.name} />
+             </div>
+ 			*/}
+           </div>
+         </div>
+ 
+         <div className="space-y-4 pb-8">
+           
+           {/* Metrics Grid - Layout conforme imagem */}
+-          <MetricsGrid data={filteredData} />
++          <MetricsGrid data={filteredData} section={section} />
+           
+           {/* Charts com altura reduzida */}
+           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+             <div className="lg:col-span-2">
+               <CampaignCharts data={filteredData} />
+             </div>
+             <div className="lg:col-span-1">
+               <Card className="border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm h-full">
+                 <CardContent className="p-4 flex items-center justify-center">
+                   <div className="text-center text-gray-500 dark:text-gray-400">
+                     <p className="text-sm">Espaço para gráficos adicionais</p>
+                   </div>
+                 </CardContent>
+               </Card>
+             </div>
+           </div>
+           
+           {/* Dynamic Content based on section and navigation level */}
+           {renderContent()}
+         </div>
+       </main>
+     </div>
+   );
+ };
+ 
+ 
+EOF
+)

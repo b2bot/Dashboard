@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
+import { SettingsProvider } from "@/hooks/useSettings";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
+        <SettingsProvider>
         <FiltersProvider>
           <TooltipProvider>
             <Toaster />
@@ -37,6 +39,7 @@ const App = () => {
             </BrowserRouter>
           </TooltipProvider>
         </FiltersProvider>
+        </SettingsProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

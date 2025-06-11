@@ -1,0 +1,67 @@
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { Platform } from './usePlatformNavigation';
+
+export interface PlatformConfig {
+  mode: 'sheets' | 'api';
+  apiKey?: string;
+  accountId?: string;
+  metrics: string[];
+}
+
+interface SettingsState {
+  platforms: Record<Platform, PlatformConfig>;
+}
+
+const defaultSettings: SettingsState = {
+  platforms: {
+    meta: { mode: 'sheets', metrics: [] },
+    google: { mode: 'sheets', metrics: [] },
+    youtube: { mode: 'sheets', metrics: [] },
+    linkedin: { mode: 'sheets', metrics: [] },
+    tiktok: { mode: 'sheets', metrics: [] },
+    analytics: { mode: 'sheets', metrics: [] },
+    instagram: { mode: 'sheets', metrics: [] },
+    b2bot: { mode: 'sheets', metrics: [] },
+    relatorios: { mode: 'sheets', metrics: [] },
+    rd: { mode: 'sheets', metrics: [] },
+  },
+};
+
+interface SettingsContextValue {
+  settings: SettingsState;
+  updatePlatform: (platform: Platform, config: Partial<PlatformConfig>) => void;
+}
+
+const SettingsContext = createContext<SettingsContextValue | undefined>(undefined);
+
+export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {
+  const [settings, setSettings] = useState<SettingsState>(() => {
+    const stored = localStorage.getItem('dashboard-settings');
+    return stored ? JSON.parse(stored) : defaultSettings;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('dashboard-settings', JSON.stringify(settings));
+  }, [settings]);
+
+  const updatePlatform = (platform: Platform, config: Partial<PlatformConfig>) => {
+    setSettings(prev => ({
+      platforms: {
+        ...prev.platforms,
+        [platform]: { ...prev.platforms[platform], ...config },
+      },
+    }));
+  };
+
+  return (
+    <SettingsContext.Provider value={{ settings, updatePlatform }}>
+      {children}
+    </SettingsContext.Provider>
+  );
+};
+
+export const useSettings = () => {
+  const ctx = useContext(SettingsContext);
+  if (!ctx) throw new Error('useSettings must be used within SettingsProvider');
+  return ctx;
+};

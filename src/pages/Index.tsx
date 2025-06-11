@@ -10,7 +10,7 @@ import CampaignTable from '@/components/dashboard/CampaignTable';
 import CampaignLevel from '@/components/dashboard/CampaignLevel';
 import AdSetLevel from '@/components/dashboard/AdSetLevel';
 import AdLevel from '@/components/dashboard/AdLevel';
-import { useSheetData } from '@/hooks/useSheetData';
+import { useDataSelector } from '@/hooks/useDataSelector';
 import { useClientManager } from '@/hooks/useClientManager';
 import { usePlatformNavigation } from '@/hooks/usePlatformNavigation';
 import { useFilters } from '@/hooks/useFilters';
@@ -26,7 +26,11 @@ const Index = () => {
   const { currentSheetId } = useClientManager();
   const { currentSheetRange, platformConfig, section, platform } = usePlatformNavigation();
   const { filters } = useFilters();
-  const { data, isLoading, error } = useSheetData(currentSheetId, currentSheetRange);
+  const { data, isLoading, error } = useDataSelector(
+    platform,
+    currentSheetId,
+    currentSheetRange
+  );
   const [selectedItem, setSelectedItem] = React.useState<string>('all');
   
   const {
