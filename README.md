@@ -1,7 +1,33 @@
-<<<<<<< HEAD
 Partner Dashboard - Mídia Performance Analytics
 
 Este é um dashboard inteligente desenvolvido para centralizar a análise de performance de campanhas de mídia em diferentes plataformas, com dados conectados diretamente via Google Sheets.
+
+## Getting Started
+
+1. Instale as dependências:
+
+   ```bash
+   npm install
+   ```
+
+2. Crie um arquivo `.env` na raiz com as variáveis de ambiente necessárias, por exemplo:
+
+   ```
+   VITE_SUPABASE_URL=https://onnvpakhibftxpqeraur.supabase.co
+   VITE_SUPABASE_ANON_KEY=<sua-chave>
+   ```
+
+3. Inicie o servidor de desenvolvimento:
+
+   ```bash
+   npm run dev
+   ```
+
+4. Para gerar uma build de produção:
+
+   ```bash
+   npm run build
+   ```
 
 🤖 Tecnologias Utilizadas
 
