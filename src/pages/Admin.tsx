@@ -1,16 +1,13 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useClientManager } from '@/hooks/useClientManager';
 import { Settings, Users, Database } from 'lucide-react';
-import { useSettings } from '@/hooks/useSettings';
+import AdminPanel from '@/components/admin/AdminPanel';
 
 const Admin = () => {
   const { currentClientId, setCurrentClientId, clients } = useClientManager();
-  const { settings, updatePlatform } = useSettings();
-  const platforms = Object.keys(settings.platforms) as Array<keyof typeof settings.platforms>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
@@ -80,66 +77,8 @@ const Admin = () => {
               )}
             </CardContent>
           </Card>
-		  
-          {platforms.map(p => {
-            const conf = settings.platforms[p];
-            return (
-              <Card key={p} className="shadow-lg border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Settings className="w-5 h-5 text-blue-600" />
-                    <span>Configuração {p}</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Integração</label>
-                    <Select value={conf.mode} onValueChange={val => updatePlatform(p, { mode: val as any })}>
-                      <SelectTrigger className="bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sheets">Sheets</SelectItem>
-                        <SelectItem value="api">API</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {conf.mode === 'api' && (
-                    <div className="space-y-2">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">API Key</label>
-                        <input
-                          className="w-full border rounded px-2 py-1 bg-white dark:bg-gray-700"
-                          value={conf.apiKey || ''}
-                          onChange={e => updatePlatform(p, { apiKey: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Account ID</label>
-                        <input
-                          className="w-full border rounded px-2 py-1 bg-white dark:bg-gray-700"
-                          value={conf.accountId || ''}
-                          onChange={e => updatePlatform(p, { accountId: e.target.value })}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Métricas (ordem)</label>
-                    <input
-                      className="w-full border rounded px-2 py-1 bg-white dark:bg-gray-700"
-                      value={conf.metrics.join(',')}
-                      onChange={e => updatePlatform(p, { metrics: e.target.value.split(',').map(m => m.trim()).filter(Boolean) })}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+          <AdminPanel />
         </div>
-
       </div>
     </div>
   );
