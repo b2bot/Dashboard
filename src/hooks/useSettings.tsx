@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Platform } from './usePlatformNavigation';
+import { supabase } from '@/lib/supabase';
 
 export interface PlatformConfig {
   mode: 'sheets' | 'api';
@@ -30,11 +31,12 @@ const defaultSettings: SettingsState = {
 interface SettingsContextValue {
   settings: SettingsState;
   updatePlatform: (platform: Platform, config: Partial<PlatformConfig>) => void;
+  saveSettings: (data: SettingsState) => Promise<void>;
 }
 
 const SettingsContext = createContext<SettingsContextValue | undefined>(undefined);
 
-export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {
+export const SettingsProvider = ({ children, clientId }: { children: React.ReactNode; clientId?: string }) => {
   const [settings, setSettings] = useState<SettingsState>(() => {
     const stored = localStorage.getItem('dashboard-settings');
     return stored ? JSON.parse(stored) : defaultSettings;
@@ -42,7 +44,23 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
 
   useEffect(() => {
     localStorage.setItem('dashboard-settings', JSON.stringify(settings));
-  }, [settings]);
+    if (clientId) {
+      supabase.from('settings').upsert({ client_id: clientId, data: settings }).catch(() => {});
+    }
+  }, [settings, clientId]);
+
+  useEffect(() => {
+    if (!clientId) return;
+    supabase
+      .from('settings')
+      .select('data')
+      .eq('client_id', clientId)
+      .single()
+      .then(({ data }) => {
+        if (data?.data) setSettings(data.data as SettingsState);
+      })
+      .catch(() => {});
+  }, [clientId]);
 
   const updatePlatform = (platform: Platform, config: Partial<PlatformConfig>) => {
     setSettings(prev => ({
@@ -53,8 +71,16 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
     }));
   };
 
+  const saveSettings = async (data: SettingsState) => {
+    setSettings(data);
+    localStorage.setItem('dashboard-settings', JSON.stringify(data));
+    if (clientId) {
+      await supabase.from('settings').upsert({ client_id: clientId, data });
+    }
+  };
+
   return (
-    <SettingsContext.Provider value={{ settings, updatePlatform }}>
+    <SettingsContext.Provider value={{ settings, updatePlatform, saveSettings }}>
       {children}
     </SettingsContext.Provider>
   );

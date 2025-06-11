@@ -15,7 +15,7 @@ interface FormValues {
 
 const AdminPanel: React.FC = () => {
   const { currentClientId } = useClientManager();
-  const { settings, saveSettings } = useSettings(currentClientId);
+  const { settings, saveSettings } = useSettings();
   const { register, handleSubmit, watch } = useForm<FormValues>({
     defaultValues: settings,
   });

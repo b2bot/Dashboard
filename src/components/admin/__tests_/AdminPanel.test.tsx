@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AdminPanel from '../AdminPanel';
 import { describe, it, expect } from 'vitest';
+import { SettingsProvider } from '@/hooks/useSettings';
 
 const queryClient = new QueryClient();
 
@@ -9,7 +10,9 @@ describe('AdminPanel', () => {
   it('renders platform sections', () => {
     render(
       <QueryClientProvider client={queryClient}>
-        <AdminPanel />
+        <SettingsProvider>
+          <AdminPanel />
+        </SettingsProvider>
       </QueryClientProvider>
     );
 
