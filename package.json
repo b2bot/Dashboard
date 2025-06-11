@@ -83,7 +83,13 @@
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1",
 <<<<<<< ours
+<<<<<<< ours
     "vitest": "^3.2.3"
+=======
+    "vitest": "^1.6.0",
+    "@testing-library/react": "^14.2.1",
+    "jsdom": "^24.0.0"
+>>>>>>> theirs
 =======
     "vitest": "^1.6.0",
     "@testing-library/react": "^14.2.1",
