@@ -10,10 +10,12 @@ import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import { SettingsProvider } from "@/hooks/useSettings";
+import { useClientManager } from "@/hooks/useClientManager";
 
 const queryClient = new QueryClient();
 
 const App = () => {
+  const { currentClientId } = useClientManager();
   useEffect(() => {
     // Apply theme class to html element on mount
     const theme = localStorage.getItem('theme') || 'light';
@@ -24,7 +26,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <SettingsProvider>
+        <SettingsProvider clientId={currentClientId}>
         <FiltersProvider>
           <TooltipProvider>
             <Toaster />
