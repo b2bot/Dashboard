@@ -28,8 +28,8 @@ export const platforms = {
   analytics: {
     label: 'Google Analytics',
     fields: [
-      { name: 'measurementId', label: 'Measurement ID' },
-      { name: 'apiSecret', label: 'API Secret' },
+      { name: 'propertyId', label: 'Property ID' },
+      { name: 'accessToken', label: 'Access Token' },
     ],
   },
 };

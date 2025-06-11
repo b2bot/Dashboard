@@ -1,5 +1,6 @@
 import { useSettings } from './useSettings';
 import { useMetaData } from './useMetaData';
+import { useAnalyticsData } from './useAnalyticsData';
 import { useSheetData } from './useSheetData';
 import { Platform } from './usePlatformNavigation';
 
@@ -10,11 +11,19 @@ export const useDataSelector = (
 ) => {
   const { settings } = useSettings();
   const conf = settings.platforms[platform];
-  return conf?.mode === 'api'
-    ? useMetaData({
+  if (conf?.mode === 'api') {
+    if (platform === 'analytics') {
+      return useAnalyticsData({
         token: conf.apiKey || '',
-        accountId: conf.accountId || '',
-        fields: conf.metrics,
-      })
-    : useSheetData(sheetId, range);
+        propertyId: conf.accountId || '',
+        metrics: conf.metrics,
+      });
+    }
+    return useMetaData({
+      token: conf.apiKey || '',
+      accountId: conf.accountId || '',
+      fields: conf.metrics,
+    });
+  }
+  return useSheetData(sheetId, range);
 };
