@@ -4,11 +4,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/ui/theme-toggle';
 import { usePlatformNavigation, Platform, platformConfig } from '@/hooks/usePlatformNavigation';
+import { useAuth } from '@/hooks/useAuth';
 import { Menu } from 'lucide-react';
 
 const PlatformNavigation = () => {
   const { platform, setPlatform } = usePlatformNavigation();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const { signOut } = useAuth();
   
   // Ordem exata conforme solicitado (removido Instagram e RD)
   const platforms: Platform[] = ['meta', 'google', 'youtube', 'linkedin', 'tiktok', 'analytics', 'b2bot', 'relatorios'];
@@ -101,8 +103,11 @@ const PlatformNavigation = () => {
             </div>
           )}
 
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center space-x-2">
             <ThemeToggle />
+            <Button variant="ghost" size="sm" onClick={signOut}>
+              Sair
+            </Button>
           </div>
         </div>
       </div>
