@@ -45,7 +45,11 @@ export const SettingsProvider = ({ children, clientId }: { children: React.React
   useEffect(() => {
     localStorage.setItem('dashboard-settings', JSON.stringify(settings));
     if (clientId) {
-      supabase.from('settings').upsert({ client_id: clientId, data: settings }).catch(() => {});
+      supabase
+        .from('settings')
+        .upsert({ client_id: clientId, data: settings })
+        .then(() => {})
+        .catch(() => {});
     }
   }, [settings, clientId]);
 
