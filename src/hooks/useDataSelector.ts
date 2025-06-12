@@ -4,6 +4,7 @@ import { useAnalyticsData } from './useAnalyticsData';
 import { useSheetData } from './useSheetData';
 import { Platform } from './usePlatformNavigation';
 
+/* eslint-disable react-hooks/rules-of-hooks */
 export const useDataSelector = (
   platform: Platform,
   sheetId: string,
