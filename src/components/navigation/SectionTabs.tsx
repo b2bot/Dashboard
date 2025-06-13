@@ -21,7 +21,7 @@ interface SectionTabsProps {
 }
 
 const SectionTabs = ({ accounts, data }: SectionTabsProps) => {
-  const { section, setSection } = usePlatformNavigation();
+  const { section, setSection, platform } = usePlatformNavigation();
   const { filters, updateFilters } = useFilters();
 
   const handleExport = () => {
@@ -46,11 +46,21 @@ const SectionTabs = ({ accounts, data }: SectionTabsProps) => {
     window.URL.revokeObjectURL(url);
   };
 
-  const sections = [
-    { id: 'campanhas' as TabSection, label: 'Campanhas', icon: BarChart3 },
-    { id: 'grupos' as TabSection, label: 'Grupos de Anúncio', icon: Users },
-    { id: 'anuncios' as TabSection, label: 'Anúncios', icon: Target },
-  ];
+  const sections = React.useMemo(() => {
+    if (platform === 'relatorios') {
+      return [
+        { id: 'campanhas' as TabSection, label: 'Relatórios', icon: BarChart3 },
+        { id: 'grupos' as TabSection, label: 'Observações', icon: Users },
+      ];
+    }
+    return [
+      { id: 'campanhas' as TabSection, label: 'Campanhas', icon: BarChart3 },
+      { id: 'grupos' as TabSection, label: 'Grupos de Anúncio', icon: Users },
+      { id: 'anuncios' as TabSection, label: 'Anúncios', icon: Target },
+    ];
+  }, [platform]);
+
+  const gridColsClass = `grid-cols-${sections.length}`;
 
   return (
     <div className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
@@ -58,7 +68,9 @@ const SectionTabs = ({ accounts, data }: SectionTabsProps) => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between py-2 gap-3">
 
           <Tabs value={section} onValueChange={(value) => setSection(value as TabSection)}>
-            <TabsList className="grid grid-cols-3 bg-gray-50 dark:bg-gray-800 p-1 rounded-lg transition-all duration-300 h-9 w-full sm:w-auto">
+            <TabsList
+              className={`grid ${gridColsClass} bg-gray-50 dark:bg-gray-800 p-1 rounded-lg transition-all duration-300 h-9 w-full sm:w-auto`}
+            >
               {sections.map((sectionItem) => {
                 const Icon = sectionItem.icon;
                 return (
@@ -90,22 +102,24 @@ const SectionTabs = ({ accounts, data }: SectionTabsProps) => {
             </div>
 
             {/* Select agora após o DateRangePicker */}
-            <Select
-              value={filters.selectedAccount}
-              onValueChange={(value) => updateFilters({ selectedAccount: value })}
-            >
-              <SelectTrigger className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-9">
-                <SelectValue placeholder="Todas as contas" />
-              </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                <SelectItem value="all">Todas as contas</SelectItem>
-                {accounts.map((account) => (
-                  <SelectItem key={account} value={account}>
-                    {account}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {platform !== 'relatorios' && (
+              <Select
+                value={filters.selectedAccount}
+                onValueChange={(value) => updateFilters({ selectedAccount: value })}
+              >
+                <SelectTrigger className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-9">
+                  <SelectValue placeholder="Todas as contas" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                  <SelectItem value="all">Todas as contas</SelectItem>
+                  {accounts.map((account) => (
+                    <SelectItem key={account} value={account}>
+                      {account}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
 
             {/* Botão de Exportar agora à direita */}
             <Button

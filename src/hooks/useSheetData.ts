@@ -51,6 +51,9 @@ export interface SheetRow {
   orcamentos?: number;
   vendas?: number;
   faturado?: number;
+  responsavel?: string;
+  observacoes?: string;
+  submissionDate?: string;
   devicePlatform: string;
   conversionDevice: string;
   adCreativeName: string;
@@ -197,6 +200,18 @@ export const useSheetData = (sheetId: string, range: string = 'Meta!A1:Z') => {
               break;
             case 'faturado':
               mappedRow.faturado = parseNumber(value);
+              break;
+            case 'respons\u00e1vel':
+            case 'responsavel':
+              mappedRow.responsavel = value;
+              break;
+            case 'observa\u00e7\u00f5es':
+            case 'observacoes':
+              mappedRow.observacoes = value;
+              break;
+            case 'data de envio':
+            case 'submission date':
+              mappedRow.submissionDate = value;
               break;
             case 'messaging conversations':
               mappedRow.messagingConversations = parseNumber(value);
