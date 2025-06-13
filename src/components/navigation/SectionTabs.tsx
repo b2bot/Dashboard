@@ -50,7 +50,6 @@ const SectionTabs = ({ accounts, data }: SectionTabsProps) => {
     if (platform === 'relatorios') {
       return [
         { id: 'campanhas' as TabSection, label: 'Relatórios', icon: BarChart3 },
-        { id: 'grupos' as TabSection, label: 'Observações', icon: Users },
       ];
     }
     return [

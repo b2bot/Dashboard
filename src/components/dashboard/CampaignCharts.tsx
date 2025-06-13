@@ -33,6 +33,8 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
     const agend = row.agendado || 0;
     const vendas = row.vendas || 0;
     const contatos = row.contatos || 0;
+    const orcamentos = row.orcamentos || 0;
+    const faturado = row.faturado || 0;
     if (existingDay) {
       existingDay.impressions += row.impressions || 0;
       existingDay.clicks += row.clicks || 0;
@@ -41,6 +43,8 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
       existingDay.agendado += agend;
       existingDay.vendas += vendas;
       existingDay.contatos += contatos;
+      existingDay.orcamentos += orcamentos;
+      existingDay.faturado += faturado;
     } else {
       acc.push({
         day: row.day,
@@ -51,6 +55,8 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
         agendado: agend,
         vendas,
         contatos,
+        orcamentos,
+        faturado,
       });
     }
     return acc;
@@ -63,6 +69,8 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
     agendado: number;
     vendas: number;
     contatos: number;
+    orcamentos: number;
+    faturado: number;
   }>)
   .sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime());
 
@@ -125,7 +133,8 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
                   <YAxis stroke="#6B7280" fontSize={11} />
                   <Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px' }} />
                   <Line type="monotone" dataKey="contatos" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 3 }} name="Contatos" />
-                  <Line type="monotone" dataKey="agendado" stroke="#F59E0B" strokeWidth={2} dot={{ fill: '#F59E0B', r: 3 }} name="Agendado" />
+                  <Line type="monotone" dataKey="agendado" stroke="#F59E0B" strokeWidth={2} dot={{ fill: '#F59E0B', r: 3 }} name="Agendados" />
+                  <Line type="monotone" dataKey="vendas" stroke="#10B981" strokeWidth={2} dot={{ fill: '#10B981', r: 3 }} name="Vendas" />
                 </LineChart>
               ) : (
               <AreaChart data={dailyData}>
@@ -178,11 +187,11 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
         </CardContent>
       </Card>
 
-      {/* Gráfico de Impressões vs Cliques ou Agendado vs Vendas */}
+      {/* Gráfico de Impressões vs Cliques ou Orçamentos x Faturado */}
       <Card className="col-span-1 lg:col-span-3 group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            {platform === 'relatorios' ? 'Agendado vs Vendas' : 'Impressões vs Cliques'}
+            {platform === 'relatorios' ? 'Orçamentos x Faturado por Data' : 'Impressões vs Cliques'}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -202,8 +211,8 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
                 />
                 {platform === 'relatorios' ? (
                   <>
-                    <Line type="monotone" dataKey="agendado" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 3 }} name="Agendado" />
-                    <Line type="monotone" dataKey="vendas" stroke="#F59E0B" strokeWidth={2} dot={{ fill: '#F59E0B', r: 3 }} name="Vendas" />
+                    <Line type="monotone" dataKey="orcamentos" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 3 }} name="Orçamentos" />
+                    <Line type="monotone" dataKey="faturado" stroke="#F59E0B" strokeWidth={2} dot={{ fill: '#F59E0B', r: 3 }} name="Faturado" />
                   </>
                 ) : (
                   <>
