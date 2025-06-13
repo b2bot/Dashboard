@@ -53,9 +53,9 @@ export const SettingsProvider = ({
   });
 
   useEffect(() => {
-    if (!clientId || !isValidUUID(clientId)) return;
-
     localStorage.setItem('dashboard-settings', JSON.stringify(settings));
+
+    if (!clientId || !isValidUUID(clientId)) return;
     supabase
       .from('settings')
       .upsert({ client_id: clientId, data: settings })

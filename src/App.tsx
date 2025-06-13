@@ -34,8 +34,8 @@ const App = () => {
           <BrowserRouter basename="/dashboard/">
             {/* Register e Login SEM o SettingsProvider */}
             <Routes>
-              <Route path="login" element={<Login />} />
-              <Route path="register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
             </Routes>
 
             {/* Se o clientId existir, carrega o restante do app */}

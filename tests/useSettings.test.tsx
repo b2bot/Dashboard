@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { SettingsProvider, useSettings } from '../src/hooks/useSettings';
 
 describe('useSettings persistence', () => {
@@ -6,7 +6,7 @@ describe('useSettings persistence', () => {
     localStorage.clear();
   });
 
-  it('updates and persists platform mode', () => {
+  it('updates and persists platform mode', async () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <SettingsProvider>{children}</SettingsProvider>
     );
@@ -16,8 +16,12 @@ describe('useSettings persistence', () => {
       result.current.updatePlatform('meta', { mode: 'api' });
     });
 
-    expect(result.current.settings.platforms.meta.mode).toBe('api');
-    const stored = JSON.parse(localStorage.getItem('dashboard-settings') || '{}');
-    expect(stored.platforms.meta.mode).toBe('api');
+    await waitFor(() => {
+      expect(result.current.settings.platforms.meta.mode).toBe('api');
+      const stored = JSON.parse(
+        localStorage.getItem('dashboard-settings') || '{}'
+      );
+      expect(stored.platforms.meta.mode).toBe('api');
+    });
   });
 });
