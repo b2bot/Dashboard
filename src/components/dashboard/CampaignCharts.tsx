@@ -162,11 +162,11 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
         </CardContent>
       </Card>
 
-      {/* Gráfico de Impressões vs Cliques - altura reduzida */}
+      {/* Gráfico de Impressões vs Cliques ou Contatos vs Agendado */}
       <Card className="col-span-1 lg:col-span-3 group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Impressões vs Cliques
+            {platform === 'relatorios' ? 'Contatos vs Agendado' : 'Impressões vs Cliques'}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -186,8 +186,8 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
                 />
                 {platform === 'relatorios' ? (
                   <>
-                    <Line type="monotone" dataKey="atendimento" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 3 }} name="Atendimento" />
-                    <Line type="monotone" dataKey="vendas" stroke="#F59E0B" strokeWidth={2} dot={{ fill: '#F59E0B', r: 3 }} name="Vendas" />
+                    <Line type="monotone" dataKey="contatos" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 3 }} name="Contatos" />
+                    <Line type="monotone" dataKey="agendado" stroke="#F59E0B" strokeWidth={2} dot={{ fill: '#F59E0B', r: 3 }} name="Agendado" />
                   </>
                 ) : (
                   <>

@@ -87,7 +87,21 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                {section === 'grupos' ? (
+                {isRelatorios && section === 'campanhas' ? (
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                    <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Data Envio</th>
+                    <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[160px]">Conta</th>
+                    <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[120px]">Responsável</th>
+                    <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Data</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Contatos</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Agendado</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Atendimento</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Orçamentos</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[80px]">Vendas</th>
+                    <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Faturado</th>
+                    <th className="text-left py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs">Observações</th>
+                  </tr>
+                ) : section === 'grupos' ? (
                   <tr className="border-b border-gray-200 dark:border-gray-700">
                     <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400 text-xs w-[200px]">Grupo de Anúncio</th>
                     <th className="text-right py-3 px-2 font-medium text-gray-600 dark:text-gray-400 text-xs w-[100px]">Investimento</th>
@@ -126,11 +140,54 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                 )}
               </thead>
               <tbody>
-                {data.slice(0, 20).map((row, index) => (
-                  <tr
-                    key={index}
-                    className="border-b border-gray-100 dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/10 dark:hover:to-purple-900/10 transition-all duration-200 group/row"
-                  >
+                {data.slice(0, 20).map((row, index) => {
+                  if (isRelatorios && section === 'campanhas') {
+                    return (
+                      <tr
+                        key={index}
+                        className="border-b border-gray-100 dark:border-gray-700"
+                      >
+                      <td className="py-3 px-2 text-xs text-gray-900 dark:text-gray-100">
+                        {row.submissionDate || 'N/A'}
+                      </td>
+                      <td className="py-3 px-2 text-xs text-gray-900 dark:text-gray-100">
+                        {row.accountName || 'N/A'}
+                      </td>
+                      <td className="py-3 px-2 text-xs text-gray-900 dark:text-gray-100">
+                        {row.responsavel || 'N/A'}
+                      </td>
+                      <td className="py-3 px-2 text-xs text-gray-900 dark:text-gray-100">
+                        {row.day ? format(parseISO(row.day), 'dd.MM.yyyy') : 'N/A'}
+                      </td>
+                      <td className="py-3 px-2 text-right text-xs text-gray-900 dark:text-gray-100">
+                        {formatNumber(row.contatos)}
+                      </td>
+                      <td className="py-3 px-2 text-right text-xs text-gray-900 dark:text-gray-100">
+                        {formatNumber(row.agendado)}
+                      </td>
+                      <td className="py-3 px-2 text-right text-xs text-gray-900 dark:text-gray-100">
+                        {formatNumber(row.atendimento)}
+                      </td>
+                      <td className="py-3 px-2 text-right text-xs text-gray-900 dark:text-gray-100">
+                        {formatNumber(row.orcamentos)}
+                      </td>
+                      <td className="py-3 px-2 text-right text-xs text-gray-900 dark:text-gray-100">
+                        {formatNumber(row.vendas)}
+                      </td>
+                      <td className="py-3 px-2 text-right text-xs text-gray-900 dark:text-gray-100">
+                        {formatCurrency(row.faturado)}
+                      </td>
+                      <td className="py-3 px-2 text-xs text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+                        {row.observacoes || 'N/A'}
+                      </td>
+                    </tr>
+                    );
+                  }
+                  return (
+                    <tr
+                      key={index}
+                      className="border-b border-gray-100 dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/10 dark:hover:to-purple-900/10 transition-all duration-200 group/row"
+                    >
                     <td className="py-3 px-4">
                       <div className="flex items-center space-x-2">
                         <div className="min-w-0 flex-1">
@@ -297,8 +354,9 @@ const CampaignTable = ({ data, section = 'campanhas' }: CampaignTableProps) => {
                         </Button>
                       </td>
                     )}
-                  </tr>
-                ))}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
             {data.length > 20 && (

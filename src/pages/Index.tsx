@@ -7,6 +7,7 @@ import MetricsGrid from '@/components/dashboard/MetricsGrid';
 import CampaignCharts from '@/components/dashboard/CampaignCharts';
 import FunnelVisualization from '@/components/dashboard/FunnelVisualization';
 import CampaignTable from '@/components/dashboard/CampaignTable';
+import ObservacoesTable from '@/components/dashboard/ObservacoesTable';
 import CampaignLevel from '@/components/dashboard/CampaignLevel';
 import AdSetLevel from '@/components/dashboard/AdSetLevel';
 import AdLevel from '@/components/dashboard/AdLevel';
@@ -244,6 +245,9 @@ const Index = () => {
   }
 
   const renderContent = () => {
+    if (platform === 'relatorios' && section === 'grupos') {
+      return <ObservacoesTable data={filteredData} />;
+    }
     if (section === 'campanhas') {
       if (viewLevel === 'campaigns') {
         return <CampaignLevel campaigns={campaignGroups} onCampaignClick={handleCampaignClick} />;
@@ -289,19 +293,21 @@ const Index = () => {
               <AdvancedFilters data={data || []} platformName={platformConfig?.name} />
             </div>
 			*/}
-			<div className="flex-1 lg:flex-none lg:ml-auto">
-              <ItemLevelFilter
-                items={uniqueItems}
-                selected={selectedItem}
-                onChange={setSelectedItem}
-                label={
-                  section === 'campanhas'
-                    ? 'Campanha'
-                    : section === 'grupos'
-                      ? 'Grupo de Anúncio'
-                      : 'Anúncio'
-                }
-              />
+            <div className="flex-1 lg:flex-none lg:ml-auto">
+              {platform !== 'relatorios' && (
+                <ItemLevelFilter
+                  items={uniqueItems}
+                  selected={selectedItem}
+                  onChange={setSelectedItem}
+                  label={
+                    section === 'campanhas'
+                      ? 'Campanha'
+                      : section === 'grupos'
+                        ? 'Grupo de Anúncio'
+                        : 'Anúncio'
+                  }
+                />
+              )}
             </div>
           </div>
         </div>
