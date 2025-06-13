@@ -14,15 +14,16 @@ import { SettingsProvider } from "@/hooks/useSettings";
 import { useClientManager } from "@/hooks/useClientManager";
 import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import Register from "@/pages/Register";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const { currentClientId } = useClientManager();
+
   useEffect(() => {
-    // Apply theme class to html element on mount
-    const theme = localStorage.getItem('theme') || 'light';
-    document.documentElement.classList.remove('light', 'dark');
+    const theme = localStorage.getItem("theme") || "light";
+    document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(theme);
   }, []);
 
@@ -30,37 +31,45 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider>
-          <SettingsProvider clientId={currentClientId}>
-          <FiltersProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter basename="/dashboard/">
-                <Routes>
-                  <Route path="/login" element={<Login />} />
-                  <Route
-                    path="/admin"
-                    element={
-                      <ProtectedRoute role="admin">
-                        <Admin />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/"
-                    element={
-                      <ProtectedRoute>
-                        <Index />
-                      </ProtectedRoute>
-                    }
-                  />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </TooltipProvider>
-          </FiltersProvider>
-          </SettingsProvider>
+          <BrowserRouter basename="/dashboard/">
+            {/* Register e Login SEM o SettingsProvider */}
+            <Routes>
+              <Route path="login" element={<Login />} />
+              <Route path="register" element={<Register />} />
+            </Routes>
+
+            {/* Se o clientId existir, carrega o restante do app */}
+            {currentClientId && (
+              <SettingsProvider clientId={currentClientId}>
+                <FiltersProvider>
+                  <TooltipProvider>
+                    <Toaster />
+                    <Sonner />
+                    <Routes>
+                      <Route
+                        path="/admin"
+                        element={
+                          <ProtectedRoute role="admin">
+                            <Admin />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/"
+                        element={
+                          <ProtectedRoute>
+                            <Index />
+                          </ProtectedRoute>
+                        }
+                      />
+                      {/* Rota de fallback */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </TooltipProvider>
+                </FiltersProvider>
+              </SettingsProvider>
+            )}
+          </BrowserRouter>
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>

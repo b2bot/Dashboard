@@ -36,34 +36,55 @@ interface SettingsContextValue {
 
 const SettingsContext = createContext<SettingsContextValue | undefined>(undefined);
 
-export const SettingsProvider = ({ children, clientId }: { children: React.ReactNode; clientId?: string }) => {
+function isValidUUID(uuid: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid);
+}
+
+export const SettingsProvider = ({
+  children,
+  clientId,
+}: {
+  children: React.ReactNode;
+  clientId?: string;
+}) => {
   const [settings, setSettings] = useState<SettingsState>(() => {
     const stored = localStorage.getItem('dashboard-settings');
     return stored ? JSON.parse(stored) : defaultSettings;
   });
 
   useEffect(() => {
+    if (!clientId || !isValidUUID(clientId)) return;
+
     localStorage.setItem('dashboard-settings', JSON.stringify(settings));
-    if (clientId) {
-      supabase
-        .from('settings')
-        .upsert({ client_id: clientId, data: settings })
-        .then(() => {})
-        .catch(() => {});
-    }
+    supabase
+      .from('settings')
+      .upsert({ client_id: clientId, data: settings })
+      .then(({ error }) => {
+        if (error) console.error('Erro ao salvar settings:', error.message);
+      })
+      .catch(err => {
+        console.error('Erro inesperado ao salvar settings:', err);
+      });
   }, [settings, clientId]);
 
   useEffect(() => {
-    if (!clientId) return;
-    supabase
-      .from('settings')
-      .select('data')
-      .eq('client_id', clientId)
-      .single()
-      .then(({ data }) => {
-        if (data?.data) setSettings(data.data as SettingsState);
-      })
-      .catch(() => {});
+    if (!clientId || !isValidUUID(clientId)) return;
+
+    const fetchSettings = async () => {
+      const { data, error } = await supabase
+        .from('settings')
+        .select('data')
+        .eq('client_id', clientId)
+        .single();
+
+      if (error) {
+        console.error('Erro ao buscar settings:', error.message);
+      } else if (data?.data) {
+        setSettings(data.data as SettingsState);
+      }
+    };
+
+    fetchSettings();
   }, [clientId]);
 
   const updatePlatform = (platform: Platform, config: Partial<PlatformConfig>) => {
@@ -78,8 +99,12 @@ export const SettingsProvider = ({ children, clientId }: { children: React.React
   const saveSettings = async (data: SettingsState) => {
     setSettings(data);
     localStorage.setItem('dashboard-settings', JSON.stringify(data));
-    if (clientId) {
-      await supabase.from('settings').upsert({ client_id: clientId, data });
+
+    if (clientId && isValidUUID(clientId)) {
+      const { error } = await supabase.from('settings').upsert({ client_id: clientId, data });
+      if (error) {
+        console.error('Erro ao salvar settings manualmente:', error.message);
+      }
     }
   };
 
