@@ -25,8 +25,13 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
   // Agregar dados por dia
   const rawDailyData = data.reduce((acc, row) => {
     const existingDay = acc.find(d => d.day === row.day);
-    const conv = row.actionMessagingConversationsStarted || row.conversions || row.vendas || 0;
+    const conv =
+      row.actionMessagingConversationsStarted ||
+      row.conversions ||
+      row.vendas ||
+      0;
     const agend = row.agendado || 0;
+    const vendas = row.vendas || 0;
     const contatos = row.contatos || 0;
     if (existingDay) {
       existingDay.impressions += row.impressions || 0;
@@ -34,6 +39,7 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
       existingDay.spent += row.amountSpent || 0;
       existingDay.conversions += conv;
       existingDay.agendado += agend;
+      existingDay.vendas += vendas;
       existingDay.contatos += contatos;
     } else {
       acc.push({
@@ -43,11 +49,21 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
         spent: row.amountSpent || 0,
         conversions: conv,
         agendado: agend,
+        vendas,
         contatos,
       });
     }
     return acc;
-  }, [] as Array<{day: string; impressions: number; clicks: number; spent: number; conversions: number; agendado: number; contatos: number}>)
+  }, [] as Array<{
+    day: string;
+    impressions: number;
+    clicks: number;
+    spent: number;
+    conversions: number;
+    agendado: number;
+    vendas: number;
+    contatos: number;
+  }>)
   .sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime());
 
   const dailyData = rawDailyData.map(d => ({
@@ -162,11 +178,11 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
         </CardContent>
       </Card>
 
-      {/* Gráfico de Impressões vs Cliques ou Contatos vs Agendado */}
+      {/* Gráfico de Impressões vs Cliques ou Agendado vs Vendas */}
       <Card className="col-span-1 lg:col-span-3 group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            {platform === 'relatorios' ? 'Contatos vs Agendado' : 'Impressões vs Cliques'}
+            {platform === 'relatorios' ? 'Agendado vs Vendas' : 'Impressões vs Cliques'}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -186,8 +202,8 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
                 />
                 {platform === 'relatorios' ? (
                   <>
-                    <Line type="monotone" dataKey="contatos" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 3 }} name="Contatos" />
-                    <Line type="monotone" dataKey="agendado" stroke="#F59E0B" strokeWidth={2} dot={{ fill: '#F59E0B', r: 3 }} name="Agendado" />
+                    <Line type="monotone" dataKey="agendado" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 3 }} name="Agendado" />
+                    <Line type="monotone" dataKey="vendas" stroke="#F59E0B" strokeWidth={2} dot={{ fill: '#F59E0B', r: 3 }} name="Vendas" />
                   </>
                 ) : (
                   <>

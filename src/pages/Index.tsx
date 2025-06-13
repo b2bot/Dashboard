@@ -245,8 +245,11 @@ const Index = () => {
   }
 
   const renderContent = () => {
-    if (platform === 'relatorios' && section === 'grupos') {
-      return <ObservacoesTable data={filteredData} />;
+    if (platform === 'relatorios') {
+      if (section === 'grupos') {
+        return <ObservacoesTable data={filteredData} />;
+      }
+      return <CampaignTable data={filteredData} section="campanhas" />;
     }
     if (section === 'campanhas') {
       if (viewLevel === 'campaigns') {
