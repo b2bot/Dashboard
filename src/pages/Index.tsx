@@ -7,7 +7,7 @@ import MetricsGrid from '@/components/dashboard/MetricsGrid';
 import CampaignCharts from '@/components/dashboard/CampaignCharts';
 import FunnelVisualization from '@/components/dashboard/FunnelVisualization';
 import CampaignTable from '@/components/dashboard/CampaignTable';
-import ObservacoesTable from '@/components/dashboard/ObservacoesTable';
+import RelatorioDailyTable from '@/components/dashboard/RelatorioDailyTable';
 import CampaignLevel from '@/components/dashboard/CampaignLevel';
 import AdSetLevel from '@/components/dashboard/AdSetLevel';
 import AdLevel from '@/components/dashboard/AdLevel';
@@ -246,10 +246,7 @@ const Index = () => {
 
   const renderContent = () => {
     if (platform === 'relatorios') {
-      if (section === 'grupos') {
-        return <ObservacoesTable data={filteredData} />;
-      }
-      return <CampaignTable data={filteredData} section="campanhas" />;
+      return <RelatorioDailyTable data={filteredData} />;
     }
     if (section === 'campanhas') {
       if (viewLevel === 'campaigns') {
