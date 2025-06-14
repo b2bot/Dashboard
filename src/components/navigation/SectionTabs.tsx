@@ -50,6 +50,12 @@ const SectionTabs = ({ accounts, data }: SectionTabsProps) => {
     if (platform === 'relatorios') {
       return [
         { id: 'campanhas' as TabSection, label: 'Relatórios', icon: BarChart3 },
+        { id: 'grupos' as TabSection, label: 'Observações', icon: Users },
+        {
+          id: 'anuncios' as TabSection,
+          label: 'Outros Relatórios',
+          icon: Target,
+        },
       ];
     }
     return [
@@ -101,24 +107,22 @@ const SectionTabs = ({ accounts, data }: SectionTabsProps) => {
             </div>
 
             {/* Select agora após o DateRangePicker */}
-            {platform !== 'relatorios' && (
-              <Select
-                value={filters.selectedAccount}
-                onValueChange={(value) => updateFilters({ selectedAccount: value })}
-              >
-                <SelectTrigger className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-9">
-                  <SelectValue placeholder="Todas as contas" />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                  <SelectItem value="all">Todas as contas</SelectItem>
-                  {accounts.map((account) => (
-                    <SelectItem key={account} value={account}>
-                      {account}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+            <Select
+              value={filters.selectedAccount}
+              onValueChange={(value) => updateFilters({ selectedAccount: value })}
+            >
+              <SelectTrigger className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-9">
+                <SelectValue placeholder="Todas as contas" />
+              </SelectTrigger>
+              <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                <SelectItem value="all">Todas as contas</SelectItem>
+                {accounts.map((account) => (
+                  <SelectItem key={account} value={account}>
+                    {account}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             {/* Botão de Exportar agora à direita */}
             <Button
