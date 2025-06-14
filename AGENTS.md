@@ -175,7 +175,82 @@ Este projeto é um painel de métricas para campanhas de anúncio em plataformas
 * Manter consistência de estilo com Tailwind e padrões visuais dos outros componentes.  
 * Nas demais páginas não devem haver alterações até que a página relatórios esteja exatamente conforme o usuário solicitar.
 
-O usuário já abriu várias tarefas para que a página relatórios fosse atualizada, mas nenhuma das tarefas funcionou, se houver conflitos com as demais, crie uma página exclusiva para Relatórios com seus componentes tambem exclusivos, já que a mesma nao segue a mesma estrutura das demais, isso pode evitar conflitos e finalmente entregar o resultado esperado.
 
-  Ao final você deve sempre listar o que de fato foi aplicado de acordo com uma liguagem clara para o usuário entender.
+
+
+📘 Supabase Schema + Policies – Descrição para Codex GPT
+✅ Autenticação
+A autenticação é feita com Supabase Auth (email e senha).
+Os usuários autenticados têm suas informações adicionais registradas na tabela usuarios, com o mesmo id do auth.users.
+
+
+🧱 Estrutura de Banco de Dados
+Tabelas principais:
+usuarios
+id (UUID): referência para auth.users.id
+nome (text)
+tipo (text): 'admin' ou 'cliente'
+criado_em (timestamp)
+
+
+clientes
+id (UUID, PK)
+nome (text)
+id_usuario (UUID): referência para usuarios.id
+ativo (boolean)
+tipo_acesso (text): 'sheet' ou 'api'
+criado_em (timestamp)
+
+
+contas
+id (UUID, PK)
+cliente_id (UUID): referência para clientes.id
+tipo (text): 'meta' ou 'google'
+identificador (text)
+criado_em (timestamp)
+
+
+chamados
+id (UUID, PK)
+cliente_id (UUID): referência para clientes.id
+titulo, mensagem, resposta (text)
+status (text): 'aberto', 'andamento', 'resolvido'
+criado_em (timestamp)
+
+
+criativos
+id (UUID, PK)
+cliente_id (UUID): referência para clientes.id
+titulo, arquivo_url, resposta (text
+status (text): 'pendente', 'aprovado', 'reprovado'
+criado_em (timestamp)
+
+
+
+🔐 Row-Level Security (RLS)
+RLS está ativado em todas as tabelas.
+Políticas de SELECT:
+usuarios: só pode ver a si mesmo
+
+clientes: só vê o cliente vinculado ao seu id_usuario
+contas, chamados, criativos: só vê se o cliente_id pertence a um cliente que ele controla (id_usuario = auth.uid())
+
+
+Exemplo de SELECT para segurança:
+cliente_id IN (
+  SELECT id FROM clientes WHERE id_usuario = auth.uid()
+)
+
+
+🧠 Lógica de Acesso (frontend)
+admin:
+Pode acessar /admin
+Ver e gerenciar todos os clientes, contas, chamados e criativos
+
+cliente:
+Pode acessar /
+Vê apenas suas próprias métricas e dados vinculados via Supabase
+
+
+
 
