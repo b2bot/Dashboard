@@ -154,14 +154,14 @@ Este projeto é um painel de métricas para campanhas de anúncio em plataformas
 * Não segue o layout das demais.  
 * **Cards iniciais:** Contatos, Agendado, Atendimento, Orçamentos, Vendas, Faturado.  
 * **Performance por Data:** Contato, Agendado, Atendimento.  
-* **Faturamento:** Substitui "Impressão vs Cliques". Gráfico com Orçamentos vs Faturado.  
+* **Orçamentos x Faturamento:** Substitui "Impressão vs Cliques". Gráfico com Orçamentos vs Faturado.  
 * **Funil de Conversão:** Contato \> Agendado \> Vendas.  
 * **Tabela Final:** "Dados enviados diariamente" com colunas: Data, Contato, Agendado, Atendimento, Orçamento, Vendas, Faturado.
 
 ### **Filtros e Abas**
 
 * Filtro de **data** e **conta** continuam funcionando na página de relatório.  
-* Filtro de **campanha** deve ser **ocultado** nessa página.  
+* Filtro de **campanha** deve ser **desativado (todo o conteiner/componente)** nessa página.  
 * Abas devem ser renomeadas:  
   * "Campanha" → **Relatórios**  
   * "Grupo de Anúncio" → **Observações** (conteúdo ainda será criado)  
@@ -174,6 +174,8 @@ Este projeto é um painel de métricas para campanhas de anúncio em plataformas
 * Buscar dados da aba **relatórios** na planilha para todos os componentes desta página.  
 * Manter consistência de estilo com Tailwind e padrões visuais dos outros componentes.  
 * Nas demais páginas não devem haver alterações até que a página relatórios esteja exatamente conforme o usuário solicitar.
+
+O usuário já abriu várias tarefas para que a página relatórios fosse atualizada, mas nenhuma das tarefas funcionou, se houver conflitos com as demais, crie uma página exclusiva para Relatórios com seus componentes tambem exclusivos, já que a mesma nao segue a mesma estrutura das demais, isso pode evitar conflitos e finalmente entregar o resultado esperado.
 
   Ao final você deve sempre listar o que de fato foi aplicado de acordo com uma liguagem clara para o usuário entender.
 
