@@ -31,44 +31,49 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider>
-          <BrowserRouter basename="/dashboard/">
-            {/* Register e Login SEM o SettingsProvider */}
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-            </Routes>
+          <BrowserRouter basename="/dashboard">
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <Routes>
+                {/* Rotas públicas */}
+                <Route path="login" element={<Login />} />
+                <Route path="register" element={<Register />} />
 
-            {/* Se o clientId existir, carrega o restante do app */}
-            {currentClientId && (
-              <SettingsProvider clientId={currentClientId}>
-                <FiltersProvider>
-                  <TooltipProvider>
-                    <Toaster />
-                    <Sonner />
-                    <Routes>
-                      <Route
-                        path="/admin"
-                        element={
-                          <ProtectedRoute role="admin">
-                            <Admin />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/"
-                        element={
-                          <ProtectedRoute>
-                            <Index />
-                          </ProtectedRoute>
-                        }
-                      />
-                      {/* Rota de fallback */}
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </TooltipProvider>
-                </FiltersProvider>
-              </SettingsProvider>
-            )}
+                {/* Rotas protegidas */}
+                {currentClientId && (
+                  <>
+                    <Route
+                      path="admin"
+                      element={
+                        <SettingsProvider clientId={currentClientId}>
+                          <FiltersProvider>
+                            <ProtectedRoute role="admin">
+                              <Admin />
+                            </ProtectedRoute>
+                          </FiltersProvider>
+                        </SettingsProvider>
+                      }
+                    />
+                    <Route
+                      index
+                      element={
+                        <SettingsProvider clientId={currentClientId}>
+                          <FiltersProvider>
+                            <ProtectedRoute>
+                              <Index />
+                            </ProtectedRoute>
+                          </FiltersProvider>
+                        </SettingsProvider>
+                      }
+                    />
+                  </>
+                )}
+
+                {/* Fallback */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </TooltipProvider>
           </BrowserRouter>
         </ThemeProvider>
       </AuthProvider>
