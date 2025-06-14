@@ -187,11 +187,11 @@ const CampaignCharts = ({ data }: CampaignChartsProps) => {
         </CardContent>
       </Card>
 
-      {/* Gráfico de Impressões vs Cliques ou Orçamentos x Faturado */}
+      {/* Gráfico de Impressões vs Cliques ou Orçamentos x Faturamento */}
       <Card className="col-span-1 lg:col-span-3 group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            {platform === 'relatorios' ? 'Orçamentos x Faturado por Data' : 'Impressões vs Cliques'}
+            {platform === 'relatorios' ? 'Orçamentos x Faturamento' : 'Impressões vs Cliques'}
           </CardTitle>
         </CardHeader>
         <CardContent>
